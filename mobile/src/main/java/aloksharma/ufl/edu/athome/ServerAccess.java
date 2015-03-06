@@ -9,6 +9,7 @@ import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -24,28 +25,58 @@ public class ServerAccess {
     }
 
     public void getTest(){
-        ParseQuery<ParseObject> query = ParseQuery.getQuery("AtHome");
-        query.whereEqualTo("GroupID", 1);
-        query.findInBackground(new FindCallback<ParseObject>() {
+        ParseQuery<ParseObject> atHome = ParseQuery.getQuery("AtHome");
+        ParseQuery<ParseObject> friendList = ParseQuery.getQuery("FriendList");
+        friendList.whereEqualTo("Email", "aloksharma@ufl.edu");
+        friendList.selectKeys(Arrays.asList("Friends"));
+
+        atHome.whereMatchesQuery("Email", friendList);
+        atHome.whereEqualTo("Status", true);
+
+        atHome.findInBackground(new FindCallback<ParseObject>() {
             public void done(List<ParseObject> group, ParseException e) {
                 ParseObject r1;
                 if (e == null) {
-                    Log.d("guitar", "Retrieved " + group.size() + " roommates of group 1 " + group);
+                    Log.d("guitar", "line1: " + group.size());
                     r1 = group.get(0);
-                    Log.d("guitar", "Roommte 1:" + r1.getBoolean("Status"));
+                    Log.d("guitar", "line2: " + r1.getString("Email"));
                 } else {
                     Log.d("guitar", "Error: " + e.getMessage());
                 }
             }
         });
+
+
+//        query2.whereEqualTo("Email", "aloksharma@ufl.edu");
+//        query.whereEqualTo("", query2.find);
+//        query.findInBackground(new FindCallback<ParseObject>() {
+//            public void done(List<ParseObject> group, ParseException e) {
+//                ParseObject r1;
+//                if (e == null) {
+//                    Log.d("guitar", "Retrieved " + group.size() + " roommates of group 1 " + group);
+//                    r1 = group.get(0);
+//                    Log.d("guitar", "Roommte 1:" + r1.getBoolean("Status"));
+//                } else {
+//                    Log.d("guitar", "Error: " + e.getMessage());
+//                }
+//            }
+//        });
     }
 
-    public void putTest(String email){
+    public void putTest(){
         ParseObject appCloud = new ParseObject("AtHome");
-        appCloud.put("Email", email);
-        appCloud.put("GroupID", 1);
+//        appCloud.put("Email", "aloksharma@ufl.edu");
+//        appCloud.put("Status", true);
+//        appCloud.put("Email", "stalukdar@ufl.edu");
+//        appCloud.put("Status", true);
+        appCloud.put("Email", "mrig@ufl.edu");
         appCloud.put("Status", true);
 
+        ParseObject appCloud2 = new ParseObject("FriendList");
+        appCloud2.put("Email", "aloksharma@ufl.edu");
+        appCloud2.addAllUnique("Friends", Arrays.asList("stalukdar@ufl.edu", "mrig@ufl.edu"));
+
         appCloud.saveInBackground();
+        appCloud2.saveInBackground();
     }
 }

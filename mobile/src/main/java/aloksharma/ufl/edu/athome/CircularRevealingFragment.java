@@ -15,9 +15,6 @@ import android.view.animation.DecelerateInterpolator;
  * Created by Alok on 2/26/2015.
  */
 
-/**
- * Our demo fragment
- */
 public class CircularRevealingFragment extends Fragment
 {
     int cx, cy;
@@ -26,13 +23,12 @@ public class CircularRevealingFragment extends Fragment
     {
     }
 
-    public static CircularRevealingFragment newInstance(int centerX, int centerY, int color, boolean doAccelerate)
+    public static CircularRevealingFragment newInstance(int centerX, int centerY, int color)
     {
         Bundle args = new Bundle();
         args.putInt("cx", centerX);
         args.putInt("cy", centerY);
         args.putInt("color", color);
-        args.putBoolean("doAccelerate", doAccelerate);
         CircularRevealingFragment fragment = new CircularRevealingFragment();
         fragment.setArguments(args);
         return fragment;
@@ -60,10 +56,9 @@ public class CircularRevealingFragment extends Fragment
                 // get the hypothenuse so the radius is from one corner to the other
                 int radius = (int)Math.hypot(right, bottom);
 
+                // TODO: Handle animation for pre lollipop devices.
                 Animator reveal = ViewAnimationUtils.createCircularReveal(v, cx, cy, 0, radius);
-                if(getArguments().getBoolean("doAccelerate")) {
-                    reveal.setInterpolator(new DecelerateInterpolator(1.5f));
-                }
+                reveal.setInterpolator(new DecelerateInterpolator(1.5f));
                 reveal.setDuration(700);
                 reveal.start();
             }
@@ -127,9 +122,7 @@ public class CircularRevealingFragment extends Fragment
             return null;
         }
         Animator anim = ViewAnimationUtils.createCircularReveal(getView(), (int) cx, (int) cy, radius, 0);
-        if(getArguments().getBoolean("doAccelerate")) {
-            anim.setInterpolator(new AccelerateInterpolator(1.5f));
-        }
+        anim.setInterpolator(new AccelerateInterpolator(1.5f));
         anim.setDuration(700);
         return anim;
     }
