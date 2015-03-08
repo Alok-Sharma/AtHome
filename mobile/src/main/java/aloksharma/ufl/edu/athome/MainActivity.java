@@ -34,7 +34,8 @@ public class MainActivity extends Activity {
 
 
         server = new ServerAccess(this);
-        server.getTest();
+//        server.getFriends();
+        server.putUser();
     }
 
     /*
