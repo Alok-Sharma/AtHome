@@ -6,12 +6,16 @@ import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
+
+import java.util.ArrayList;
 
 
 public class MainActivity extends Activity {
 
     ServerAccess server;
     private Button button1;
+    private TextView mainText;
     private CircularRevealingFragment mfragment;
     private float x,y;
     private Boolean fragUp = false;
@@ -22,6 +26,7 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
 
         button1 = (Button)findViewById(R.id.addButton1);
+        mainText = (TextView)findViewById(R.id.mainText);
 
         button1.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -34,8 +39,18 @@ public class MainActivity extends Activity {
 
 
         server = new ServerAccess(this);
-//        server.getFriends();
-        server.putUser();
+//        server.addFriend("aloksharma@ufl.edu");
+    }
+
+    public void changeText(ArrayList<String> friendsHome, ArrayList<String> friendsNotHome){
+        int numAtHome = friendsHome.size();
+        if(numAtHome == 0){
+            mainText.setText("Nope,\nno one\nis home.");
+        }else if (numAtHome == 1){
+            mainText.setText("Yep,\n1 person\nis home.");
+        }else{
+            mainText.setText("Yep,\n" + numAtHome + " people\n are home.");
+        }
     }
 
     /*
