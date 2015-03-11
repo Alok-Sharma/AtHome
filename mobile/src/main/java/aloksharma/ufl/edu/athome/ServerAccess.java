@@ -23,13 +23,13 @@ public class ServerAccess {
 
     String userEmail = "aloksharma@ufl.edu";
     ParseObject userObject;
-    boolean userFetched = false;
+    boolean userFetched = false; //remove
     MainActivity mainActivity;
     Context mcontext;
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor sharedPrefEditor;
 
-    public ServerAccess(Context context) {
+    public ServerAccess(final Context context) {
         this.mcontext = context;
         sharedPreferences = mcontext.getSharedPreferences(mcontext.getString(R.string.shared_pref_name), mcontext.MODE_PRIVATE);
         sharedPrefEditor = sharedPreferences.edit();
@@ -61,6 +61,7 @@ public class ServerAccess {
                         userObject = parseObjects.get(0);
                         userFetched = true;
                     }
+
 
                     //Got the userObject. If mainActivity spawned the server, populate the fields.
                     if(mcontext instanceof MainActivity){
@@ -181,23 +182,24 @@ public class ServerAccess {
 
             @Override
             public void done(List<ParseObject> friendObject, ParseException e) {
-                if(friendObject.size() == 0){
+                if (friendObject.size() == 0) {
                     //friend doesn't exists, send invite here.
-                }else{
+                } else {
                     //friend exists, add to friend list.
-
+                    Log.d("guitar", "userobject before add friend: " + userObject.getList("FriendList"));
                     userObject.add("FriendList", friendEmail);
                     userObject.pinInBackground();
                     userObject.saveInBackground(new SaveCallback() {
                         @Override
                         public void done(ParseException e) {
-                            if(e != null){
+                            if (e != null) {
                                 Log.d("guitar", "unable to add friend: " + e.getMessage());
-                            }else{
+                            } else {
                                 getFriendStatus();
                             }
                         }
                     });
+                    Log.d("guitar", "userobject after add friend: " + userObject.getList("FriendList"));
 
                     //Add yourself to the friends list as well.
                     //There should be only one object returned for that friend email, since it is unique. Which is why accessing the 0th index.
@@ -207,7 +209,7 @@ public class ServerAccess {
                     friendObject.get(0).saveInBackground(new SaveCallback() {
                         @Override
                         public void done(ParseException e) {
-                            if(e != null){
+                            if (e != null) {
                                 Log.d("guitar", "unable to add user to friends list " + e.getMessage());
                             }
                         }

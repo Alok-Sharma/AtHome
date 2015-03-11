@@ -42,6 +42,7 @@ public class MainActivity extends Activity {
         });
 
         server = new ServerAccess(this);
+
         Log.d("guitar", "wifi: " + getWifiName(this));
     }
 
