@@ -1,8 +1,12 @@
 package aloksharma.ufl.edu.athome;
 
 import android.app.Activity;
+import android.content.Context;
 import android.graphics.Color;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
@@ -37,9 +41,19 @@ public class MainActivity extends Activity {
             }
         });
 
-
         server = new ServerAccess(this);
-//        server.addFriend("aloksharma@ufl.edu");
+        Log.d("guitar", "wifi: " + getWifiName(this));
+    }
+
+    public String getWifiName(Context context) {
+        String bssid = "none";
+        WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+        WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+        bssid = wifiInfo.getBSSID();
+//        if (WifiInfo.getDetailedStateOf(wifiInfo.getSupplicantState()) == NetworkInfo.DetailedState.CONNECTED) {
+//            bssid = wifiInfo.getBSSID();
+//        }
+        return bssid;
     }
 
     public void changeText(ArrayList<String> friendsHome, ArrayList<String> friendsNotHome){
