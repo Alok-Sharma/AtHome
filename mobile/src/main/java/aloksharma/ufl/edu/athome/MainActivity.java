@@ -1,12 +1,9 @@
 package aloksharma.ufl.edu.athome;
 
 import android.app.Activity;
-import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
-import android.net.wifi.WifiInfo;
-import android.net.wifi.WifiManager;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
@@ -24,6 +21,8 @@ public class MainActivity extends Activity {
     private float x,y;
     private Boolean fragUp = false;
 
+    Intent mServiceIntent;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -31,30 +30,18 @@ public class MainActivity extends Activity {
 
         button1 = (Button)findViewById(R.id.addButton1);
         mainText = (TextView)findViewById(R.id.mainText);
-
         button1.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 x = v.getLeft() + event.getX();
                 y = v.getTop() + event.getY();
+//                App app = (App)getApplication();
+//                mServiceIntent = new Intent(getApplicationContext(), ServerAccess.class);
+//                mServiceIntent.putExtra("server_action", ServerAccess.ServerAction.ADD_FRIEND.toString());
+//                getApplicationContext().startService(mServiceIntent);
                 return false;
             }
         });
-
-        server = new ServerAccess(this);
-
-        Log.d("guitar", "wifi: " + getWifiName(this));
-    }
-
-    public String getWifiName(Context context) {
-        String bssid = "none";
-        WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
-        WifiInfo wifiInfo = wifiManager.getConnectionInfo();
-        bssid = wifiInfo.getBSSID();
-//        if (WifiInfo.getDetailedStateOf(wifiInfo.getSupplicantState()) == NetworkInfo.DetailedState.CONNECTED) {
-//            bssid = wifiInfo.getBSSID();
-//        }
-        return bssid;
     }
 
     public void changeText(ArrayList<String> friendsHome, ArrayList<String> friendsNotHome){
@@ -73,8 +60,6 @@ public class MainActivity extends Activity {
      */
     public void addFragment(final View v)
     {
-//		int randomColor =
-//				Color.argb(255, (int)(Math.random() * 255), (int)(Math.random() * 255), (int)(Math.random() * 255));
         fragUp = true;
         int randomColor = Color.GREEN;
         mfragment = CircularRevealingFragment.newInstance((int) x, (int) y, randomColor);

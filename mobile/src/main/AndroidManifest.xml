@@ -21,6 +21,11 @@
             </intent-filter>
         </activity>
 
+        <service
+            android:name=".ServerAccess"
+            android:exported="false">
+        </service>
+
         <receiver android:name=".WifiChangeReceiver" android:label="NetworkChangeReceiver">
             <intent-filter>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE">

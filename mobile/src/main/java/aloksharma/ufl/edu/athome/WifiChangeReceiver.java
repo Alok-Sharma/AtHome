@@ -20,31 +20,31 @@ public class WifiChangeReceiver extends BroadcastReceiver {
         Log.d("guitar", "broadcast received");
         ConnectivityManager connectionManager = (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = connectionManager.getActiveNetworkInfo(); //TODO activeNetwork can be null
-        ServerAccess server = new ServerAccess(context.getApplicationContext());
-        if(activeNetwork != null){
-            boolean isWiFi = activeNetwork.getType() == ConnectivityManager.TYPE_WIFI;
-            boolean isConnected = activeNetwork.isConnected();
-            Log.d("guitar", "active network not null, type: " + activeNetwork.getType() + " connected: " + isConnected);
-            String currentWifi;
-            if(isWiFi && isConnected){
-                currentWifi = getWifiName(context);
-                Log.d("guitar", "broadcast bssid " + currentWifi);
-                if(currentWifi.equals(homeWifi)){
-                    //at home
-                    server.setAtHomeStatus(true);
-                }else{
-                    //not at home
-                    server.setAtHomeStatus(false);
-                }
-            }else{
-                // not connected to wifi.
-                server.setAtHomeStatus(false);
-            }
-        }else{
-            //not connected to internet
-            Log.d("guitar", "active network null");
-            server.setAtHomeStatus(false);
-        }
+        ServerAccess server = new ServerAccess();
+//        if(activeNetwork != null){
+//            boolean isWiFi = activeNetwork.getType() == ConnectivityManager.TYPE_WIFI;
+//            boolean isConnected = activeNetwork.isConnected();
+//            Log.d("guitar", "active network not null, type: " + activeNetwork.getType() + " connected: " + isConnected);
+//            String currentWifi;
+//            if(isWiFi && isConnected){
+//                currentWifi = getWifiName(context);
+//                Log.d("guitar", "broadcast bssid " + currentWifi);
+//                if(currentWifi.equals(homeWifi)){
+//                    //at home
+//                    server.setAtHomeStatus(true);
+//                }else{
+//                    //not at home
+//                    server.setAtHomeStatus(false);
+//                }
+//            }else{
+//                // not connected to wifi.
+//                server.setAtHomeStatus(false);
+//            }
+//        }else{
+//            //not connected to internet
+//            Log.d("guitar", "active network null");
+//            server.setAtHomeStatus(false);
+//        }
     }
 
     public String getWifiName(Context context) {
