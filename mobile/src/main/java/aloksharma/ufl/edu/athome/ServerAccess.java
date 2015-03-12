@@ -17,7 +17,6 @@ import java.util.List;
  * Use this to talk to the backend server.
  */
 
-//TODO have this whole class be in its own thread. Then instead of calling findInBackground, call find. Sequential execution of functions will be possible then.
 public class ServerAccess extends IntentService {
 
     public enum ServerAction {
@@ -57,7 +56,7 @@ public class ServerAccess extends IntentService {
 
                     if(friends.get(j).getString("Email").equals(userObject.getString("Email"))){
                         //if found myself in list, update myself in local datastore.
-                        Log.d("guitar", "fetched my own details while fetching freinds: ");
+                        Log.d("guitar", "fetched my own details while fetching friends status");
                         friends.get(j).pin();
                     }else if(friends.get(j).getBoolean("Status")){
                         friendsHome.add(friends.get(j).getString("Email"));
@@ -252,10 +251,12 @@ public class ServerAccess extends IntentService {
             Log.d("guitarintent", "add user intent");
         }else if(action.equals(ServerAction.GET_FRIENDS_HOME.toString())){
             Log.d("guitarintent", "get friend status intent");
+            Log.d("guitarintent", "friends home: " + getFriendsHome(getUser()));
         }else if(action.equals(ServerAction.REMOVE_FRIEND.toString())){
             Log.d("guitarintent", "remove friend intent");
         }else if(action.equals(ServerAction.SET_HOME_STATUS.toString())){
-            Log.d("guitarintent", "set home status intent");
+            Log.d("guitarintent", "set home status intent: " + intent.getBooleanExtra("server_action_arg", false));
+            setAtHomeStatus(getUser(), intent.getBooleanExtra("server_action_arg", false));
         }else if(action.equals(ServerAction.GET_USER.toString())){
             Log.d("guitarintent", "get user intent");
             ParseObject userObject = getUser();

@@ -11,16 +11,16 @@ import com.parse.ParseObject;
  */
 public class App extends Application {
     ParseObject userObject;
-    Intent mServiceIntent;
+    Intent serverIntent;
     @Override
     public void onCreate() {
         super.onCreate();
         Parse.enableLocalDatastore(this);
         Parse.initialize(this, "KwiPstN87loO5vCbMsaixTkQLu6KWIYjAV9eUYrF", "EHKdb0bCDnlGuecbUfkMnxizZBMRdrZ6ntrdzLrV");
 
-        mServiceIntent = new Intent(this, ServerAccess.class);
-        mServiceIntent.putExtra("server_action", ServerAccess.ServerAction.GET_FRIENDS.toString());
-        this.startService(mServiceIntent);
+        serverIntent = new Intent(this, ServerAccess.class);
+        serverIntent.putExtra("server_action", ServerAccess.ServerAction.GET_FRIENDS_HOME.toString());
+        this.startService(serverIntent);
     }
 
     public ParseObject getUserObject() {

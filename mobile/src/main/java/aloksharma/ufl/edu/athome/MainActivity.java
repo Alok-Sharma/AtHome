@@ -1,7 +1,6 @@
 package aloksharma.ufl.edu.athome;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.MotionEvent;
@@ -21,13 +20,11 @@ public class MainActivity extends Activity {
     private float x,y;
     private Boolean fragUp = false;
 
-    Intent mServiceIntent;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        //TODO: Register local broadcast listener for updates from serveraccess.
         button1 = (Button)findViewById(R.id.addButton1);
         mainText = (TextView)findViewById(R.id.mainText);
         button1.setOnTouchListener(new View.OnTouchListener() {
