@@ -3,6 +3,7 @@ package aloksharma.ufl.edu.athome;
 import android.app.IntentService;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.parse.ParseException;
@@ -237,14 +238,21 @@ public class ServerAccess extends IntentService {
 //        return serverAccess;
 //    }
 
+    //Receive incoming requests from activities, and send appropriate server request.
+    //On receiving response from server, send broadcast back to activity.
     @Override
     protected void onHandleIntent(Intent intent) {
         //GET_USER, ADD_FRIEND, REMOVE_FRIEND, ADD_USER, GET_FRIENDS, GET_FRIENDS_STATUS, SET_HOME_STATUS
         String action;
         action = intent.getStringExtra("server_action");
+
+        Intent responseIntent = new Intent("server_response");
+        responseIntent.putExtra("server_action", action);
+
         if(action.equals(ServerAction.GET_FRIENDS.toString())){
-            Log.d("guitarintent", "get friends intent");
-            Log.d("guitarintent", "friends: " + getFriends(getUser()));
+            List<String> friendList = getFriends(getUser());
+            Log.d("guitarintent", "get friends intent: " + friendList);
+            responseIntent.putStringArrayListExtra("data", new ArrayList<>(friendList));
         }else if(action.equals(ServerAction.ADD_FRIEND.toString())){
             Log.d("guitarintent", "add friend intent");
         }else if(action.equals(ServerAction.ADD_USER.toString())){
@@ -262,6 +270,8 @@ public class ServerAccess extends IntentService {
             ParseObject userObject = getUser();
             //Take data out of userobject and send broadcast.
         }
+
+        LocalBroadcastManager.getInstance(this).sendBroadcast(responseIntent);
     }
 }
 

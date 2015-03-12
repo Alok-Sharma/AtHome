@@ -18,9 +18,9 @@ public class App extends Application {
         Parse.enableLocalDatastore(this);
         Parse.initialize(this, "KwiPstN87loO5vCbMsaixTkQLu6KWIYjAV9eUYrF", "EHKdb0bCDnlGuecbUfkMnxizZBMRdrZ6ntrdzLrV");
 
-        serverIntent = new Intent(this, ServerAccess.class);
-        serverIntent.putExtra("server_action", ServerAccess.ServerAction.GET_FRIENDS_HOME.toString());
-        this.startService(serverIntent);
+//        serverIntent = new Intent(this, ServerAccess.class);
+//        serverIntent.putExtra("server_action", ServerAccess.ServerAction.GET_FRIENDS_HOME.toString());
+//        this.startService(serverIntent);
     }
 
     public ParseObject getUserObject() {
