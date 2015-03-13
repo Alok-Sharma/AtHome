@@ -11,9 +11,11 @@ import android.os.Handler;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -28,6 +30,7 @@ public class MainActivity extends Activity {
     private Boolean fragUp = false;
     private ServerBroadcastReceiver serverBroadcastReceiver;
     private Intent serverIntent;
+    private LinearLayout atHomeUsersLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +42,7 @@ public class MainActivity extends Activity {
 
         button1 = (ImageButton)findViewById(R.id.addButton1);
         mainText = (TextView)findViewById(R.id.mainText);
+        atHomeUsersLayout = (LinearLayout)findViewById(R.id.atHomeUsers);
         button1.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -72,6 +76,7 @@ public class MainActivity extends Activity {
     }
 
     public void changeText(ArrayList<AtHomeUser> friendsHome){
+        atHomeUsersLayout.removeAllViews();
         int numAtHome = friendsHome.size();
         if(numAtHome == 0){
             mainText.setText("Nope,\nno one\nis home.");
@@ -79,6 +84,14 @@ public class MainActivity extends Activity {
             mainText.setText("Yep,\n1 person\nis home.");
         }else{
             mainText.setText("Yep,\n" + numAtHome + " people\n are home.");
+        }
+
+        for(int i = 0; i < numAtHome; i++){
+            TextView tv = new TextView(this);
+            tv.setGravity(Gravity.CENTER);
+            tv.setPadding(5,0,5,0);
+            tv.setText(friendsHome.get(i).getFirstName());
+            atHomeUsersLayout.addView(tv);
         }
     }
 

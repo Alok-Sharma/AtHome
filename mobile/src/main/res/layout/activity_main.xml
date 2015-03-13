@@ -35,8 +35,10 @@
                     android:id="@+id/addButton1"
                     android:layout_alignParentStart="true"
                     android:layout_alignParentLeft="true"
-                    android:src="@drawable/ic_menu_black_24dp"
-                    android:background="@null"/>
+                    android:src="@drawable/ic_account_circle_black_36dp"
+                    android:scaleType="centerInside"
+                    android:background="@null"
+                    android:adjustViewBounds="true"/>
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -48,6 +50,17 @@
                     android:layout_centerVertical="true"
                     android:layout_centerHorizontal="true"
                     android:gravity="center"/>
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/mainText"
+                    android:layout_centerHorizontal="true"
+                    android:id="@+id/atHomeUsers"
+                    android:gravity="center">
+
+                    </LinearLayout>
 
             </RelativeLayout>
 
