@@ -1,7 +1,7 @@
 package aloksharma.ufl.edu.athome;
 
+import android.app.Activity;
 import android.content.Intent;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -9,7 +9,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
-import com.facebook.widget.LoginButton;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseUser;
@@ -18,7 +17,7 @@ import com.parse.ParseUser;
  * Created by Soham Talukdar on 3/13/2015.
  * Login Page of the app.
  */
-public class LoginActivity extends ActionBarActivity {
+public class LoginActivity extends Activity {
     protected EditText username;
     protected EditText password;
     protected Button signIn;
