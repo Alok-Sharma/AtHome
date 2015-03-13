@@ -23,7 +23,6 @@ import java.util.ArrayList;
 
 public class MainActivity extends Activity {
 
-    ServerAccess server;
     private TextView mainText;
     private CircularRevealingFragment mfragment;
     private float x,y;
@@ -31,11 +30,14 @@ public class MainActivity extends Activity {
     private ServerBroadcastReceiver serverBroadcastReceiver;
     private Intent serverIntent;
     private LinearLayout atHomeUsersLayout;
+    private WifiChangeReceiver wifiChecker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        wifiChecker = new WifiChangeReceiver();
+        wifiChecker.checkWifiHome(this);
 
         ImageButton button1;
         final SwipeRefreshLayout swipeLayout;

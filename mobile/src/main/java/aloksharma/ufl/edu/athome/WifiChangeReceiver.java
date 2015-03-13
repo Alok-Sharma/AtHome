@@ -19,6 +19,17 @@ public class WifiChangeReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         Log.d("guitar", "broadcast received");
+        checkWifiHome(context);
+    }
+
+    public void setAtHomeStatus(Context context, Boolean status){
+        serverIntent = new Intent(context, ServerAccess.class);
+        serverIntent.putExtra("server_action", ServerAccess.ServerAction.SET_HOME_STATUS.toString());
+        serverIntent.putExtra("server_action_arg", status);
+        context.startService(serverIntent);
+    }
+
+    public void checkWifiHome(Context context){
         ConnectivityManager connectionManager = (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = connectionManager.getActiveNetworkInfo(); //TODO activeNetwork can be null
         if(activeNetwork != null){
@@ -45,13 +56,6 @@ public class WifiChangeReceiver extends BroadcastReceiver {
             Log.d("guitar", "active network null");
             setAtHomeStatus(context, false);
         }
-    }
-
-    public void setAtHomeStatus(Context context, Boolean status){
-        serverIntent = new Intent(context, ServerAccess.class);
-        serverIntent.putExtra("server_action", ServerAccess.ServerAction.SET_HOME_STATUS.toString());
-        serverIntent.putExtra("server_action_arg", status);
-        context.startService(serverIntent);
     }
 
     public String getWifiName(Context context) {
