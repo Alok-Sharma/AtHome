@@ -4,16 +4,17 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+
     <application
+        android:name=".App"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
-        android:theme="@style/AppTheme"
-        android:name=".App">
+        android:label="ATHOME"
+        android:theme="@style/AppTheme" >
         <activity
-            android:name=".MainActivity"
-            android:label="@string/app_name" >
+            android:name=".loginActivity"
+            android:label="loginActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -23,15 +24,26 @@
 
         <service
             android:name=".ServerAccess"
-            android:exported="false">
+            android:exported="false" >
         </service>
 
-        <receiver android:name=".WifiChangeReceiver" android:label="NetworkChangeReceiver">
+        <receiver
+            android:name=".WifiChangeReceiver"
+            android:label="NetworkChangeReceiver" >
             <intent-filter>
-                <action android:name="android.net.conn.CONNECTIVITY_CHANGE">
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" >
                 </action>
             </intent-filter>
         </receiver>
+
+        <activity
+            android:name=".MainActivity"
+            android:label="AT HOME" >
+        </activity>
+        <activity
+            android:name=".Registration"
+            android:label="Registration" >
+        </activity>
     </application>
 
 </manifest>
