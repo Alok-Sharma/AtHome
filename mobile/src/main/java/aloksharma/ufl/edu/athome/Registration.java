@@ -14,7 +14,6 @@ import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
-import com.facebook.Session;
 import com.parse.SignUpCallback;
 
 /**
