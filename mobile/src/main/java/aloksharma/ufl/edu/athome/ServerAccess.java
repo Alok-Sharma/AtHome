@@ -25,6 +25,7 @@ public class ServerAccess extends IntentService {
     }
 
     String userEmail = "aloksharma@ufl.edu";
+    String first_name = "Alok"; String last_name = "Sharma";
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor sharedPrefEditor;
 //    App app = (App)getApplicationContext();
@@ -36,33 +37,41 @@ public class ServerAccess extends IntentService {
     /*
         Returns list of friends who are home.
      */
-    public List<String> getFriendsHome(ParseObject userObject){
+    public List<AtHomeUser> getFriendsHome(ParseObject userObject){
 
-        List<ParseObject> friends = new ArrayList<>();
-        List<String> friendsHome = new ArrayList<>();
-        List<String> friendsNotHome = new ArrayList<>(); //populating this list, but not actually returning it.
+        List<ParseObject> friends;
+        List<AtHomeUser> friendsHome = new ArrayList<>();
+
         List<String> friendList = userObject.getList("FriendList");
         friendList.add(userObject.getString("Email")); //tell server to fetch my details, in addition to fetching details of friends.
 
         if(friendList.size() != 0) {
+
             List<ParseQuery<ParseObject>> queries = new ArrayList<ParseQuery<ParseObject>>();
             for (int i = 0; i < friendList.size(); i++) {
                 queries.add(ParseQuery.getQuery("AtHome").whereEqualTo("Email", friendList.get(i)));
             }
             ParseQuery<ParseObject> friendsQuery = ParseQuery.or(queries);
+
             try{
                 friends = friendsQuery.find();
                 for (int j = 0; j < friends.size(); j++) {
                     Log.d("guitar", friends.get(j).getString("Email") + " is " + friends.get(j).getBoolean("Status"));
+                    friends.get(j).pin(); //update their pin whenever you fetch them.
 
                     if(friends.get(j).getString("Email").equals(userObject.getString("Email"))){
                         //if found myself in list, update myself in local datastore.
-                        Log.d("guitar", "fetched my own details while fetching friends status");
+                        Log.d("guitar", "fetched my own details while fetching friends status, and updating pinned object");
                         friends.get(j).pin();
                     }else if(friends.get(j).getBoolean("Status")){
-                        friendsHome.add(friends.get(j).getString("Email"));
+                        AtHomeUser atHomeUser = new AtHomeUser();
+                        atHomeUser.setEmail(friends.get(j).getString("Email"));
+                        atHomeUser.setFirstName(friends.get(j).getString("First_Name"));
+                        atHomeUser.setLastName(friends.get(j).getString("Last_Name"));
+
+                        friendsHome.add(atHomeUser);
                     }else{
-                        friendsNotHome.add(friends.get(j).getString("Email"));
+                        //If friend not home, do nothing.
                     }
                 }
             }catch (ParseException e){
@@ -75,8 +84,8 @@ public class ServerAccess extends IntentService {
     }
 
     /*
-    Should be called only after userObject initialized.
     Done Offline. Fetches friend list. userObject wouldve already been populated.
+    Returns list of email of friends.
      */
     public List<String> getFriends(ParseObject userObject){
         List<String> friends = new ArrayList<>();
@@ -86,6 +95,11 @@ public class ServerAccess extends IntentService {
             Log.d("guitar" , "error: userobject was null in getFriends");
         }
         return friends;
+    }
+
+    public void getFriendsDetailed(ParseObject userObject){
+        List<String> friends = getFriends(userObject);
+
     }
 
     public ParseObject getUser(){
@@ -138,6 +152,8 @@ public class ServerAccess extends IntentService {
                 newUser.put("Email", userEmail);
                 newUser.put("Status", false);
                 newUser.put("FriendList", friendList);
+                newUser.put("First_Name", first_name);
+                newUser.put("Last_Name", last_name);
                 newUser.pinInBackground(); //save this offline in the datastore, and then save in cloud.
                 newUser.save();
             }else{
@@ -209,7 +225,7 @@ public class ServerAccess extends IntentService {
     }
 
     //Should be called only after userObject initialized.
-    public void setAtHomeStatus(ParseObject userObject, final Boolean status){
+    public void setAtHomeStatus(final ParseObject userObject, final Boolean status){
         //first check what we have already told the server from shared pref. If different, then tell server.
         sharedPreferences = getSharedPreferences(getString(R.string.shared_pref_name), this.MODE_PRIVATE);
         sharedPrefEditor = sharedPreferences.edit();
@@ -227,16 +243,9 @@ public class ServerAccess extends IntentService {
                 Log.d("guitar", "unable to change status: " + e.getMessage());
             }
         }else{
-            //nothing new to tell server. Dont do anything.
+//            nothing new to tell server. Dont do anything.
         }
     }
-
-//    public static ServerAccess serverAccess = null;
-//    public static ServerAccess getInstance(){
-//        if(serverAccess != null)return serverAccess;
-//        serverAccess = new ServerAccess();
-//        return serverAccess;
-//    }
 
     //Receive incoming requests from activities, and send appropriate server request.
     //On receiving response from server, send broadcast back to activity.
@@ -258,8 +267,10 @@ public class ServerAccess extends IntentService {
         }else if(action.equals(ServerAction.ADD_USER.toString())){
             Log.d("guitarintent", "add user intent");
         }else if(action.equals(ServerAction.GET_FRIENDS_HOME.toString())){
-            Log.d("guitarintent", "get friend status intent");
-            Log.d("guitarintent", "friends home: " + getFriendsHome(getUser()));
+            List<AtHomeUser> friendsHome = getFriendsHome(getUser());
+            Log.d("guitarintent", "get friends friends home: " + friendsHome);
+//            responseIntent.putStringArrayListExtra("data", new ArrayList<AtHomeUser>(friendsHome));
+            responseIntent.putParcelableArrayListExtra("data", new ArrayList<AtHomeUser>(friendsHome));
         }else if(action.equals(ServerAction.REMOVE_FRIEND.toString())){
             Log.d("guitarintent", "remove friend intent");
         }else if(action.equals(ServerAction.SET_HOME_STATUS.toString())){
@@ -268,6 +279,7 @@ public class ServerAccess extends IntentService {
         }else if(action.equals(ServerAction.GET_USER.toString())){
             Log.d("guitarintent", "get user intent");
             ParseObject userObject = getUser();
+
             //Take data out of userobject and send broadcast.
         }
 
