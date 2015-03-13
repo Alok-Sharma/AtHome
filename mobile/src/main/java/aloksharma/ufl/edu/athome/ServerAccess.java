@@ -2,7 +2,6 @@ package aloksharma.ufl.edu.athome;
 
 import android.app.IntentService;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
@@ -26,8 +25,6 @@ public class ServerAccess extends IntentService {
 
     String userEmail = "aloksharma@ufl.edu";
     String first_name = "Alok"; String last_name = "Sharma";
-    SharedPreferences sharedPreferences;
-    SharedPreferences.Editor sharedPrefEditor;
 //    App app = (App)getApplicationContext();
 
     public ServerAccess() {
@@ -47,14 +44,12 @@ public class ServerAccess extends IntentService {
 
         if(friendList.size() != 0) {
 
-            List<ParseQuery<ParseObject>> queries = new ArrayList<ParseQuery<ParseObject>>();
-            for (int i = 0; i < friendList.size(); i++) {
-                queries.add(ParseQuery.getQuery("AtHome").whereEqualTo("Email", friendList.get(i)));
-            }
-            ParseQuery<ParseObject> friendsQuery = ParseQuery.or(queries);
+            ParseQuery<ParseObject> friendQuery = new ParseQuery<>("AtHome");
+            friendQuery.whereContainedIn("Email", friendList);
 
             try{
-                friends = friendsQuery.find();
+                friends = friendQuery.find();
+                Log.d("guitar", "fetched " + friends.size() + " friends");
                 for (int j = 0; j < friends.size(); j++) {
                     Log.d("guitar", friends.get(j).getString("Email") + " is " + friends.get(j).getBoolean("Status"));
                     friends.get(j).pin(); //update their pin whenever you fetch them.
@@ -95,11 +90,6 @@ public class ServerAccess extends IntentService {
             Log.d("guitar" , "error: userobject was null in getFriends");
         }
         return friends;
-    }
-
-    public void getFriendsDetailed(ParseObject userObject){
-        List<String> friends = getFriends(userObject);
-
     }
 
     public ParseObject getUser(){
@@ -172,7 +162,7 @@ public class ServerAccess extends IntentService {
      */
     public void addFriend(ParseObject userObject, final String friendEmail){
         //TODO: send invite.
-        List<ParseObject> friendObjects = new ArrayList<>();
+        List<ParseObject> friendObjects;
         final ParseQuery<ParseObject> friendExists = ParseQuery.getQuery("AtHome");
         friendExists.whereEqualTo("Email", friendEmail);
         try{
@@ -226,19 +216,15 @@ public class ServerAccess extends IntentService {
 
     //Should be called only after userObject initialized.
     public void setAtHomeStatus(final ParseObject userObject, final Boolean status){
-        //first check what we have already told the server from shared pref. If different, then tell server.
-        sharedPreferences = getSharedPreferences(getString(R.string.shared_pref_name), this.MODE_PRIVATE);
-        sharedPrefEditor = sharedPreferences.edit();
-        Boolean statusOnServer = sharedPreferences.getBoolean("AtHome", false);
-        Log.d("guitar", "changing status to " + status + ". Shared pref says: " + statusOnServer);
+        //first check what we have already told the server from the existing user object. If different, then tell server.
+        Boolean statusOnServer = userObject.getBoolean("AtHome");
+        Log.d("guitar", "changing status to " + status + ". User object says: " + statusOnServer);
         if(statusOnServer != status){
             //send to server now.
             userObject.put("Status", status);
             try{
                 userObject.save();
                 userObject.pin();
-                sharedPrefEditor.putBoolean("AtHome", status); //save what we have told the server.
-                sharedPrefEditor.commit();
             }catch (ParseException e){
                 Log.d("guitar", "unable to change status: " + e.getMessage());
             }
