@@ -13,7 +13,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -34,10 +34,10 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Button button1;
+        ImageButton button1;
         final SwipeRefreshLayout swipeLayout;
 
-        button1 = (Button)findViewById(R.id.addButton1);
+        button1 = (ImageButton)findViewById(R.id.addButton1);
         mainText = (TextView)findViewById(R.id.mainText);
         button1.setOnTouchListener(new View.OnTouchListener() {
             @Override
