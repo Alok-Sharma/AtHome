@@ -7,9 +7,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.content.LocalBroadcastManager;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
@@ -18,7 +16,11 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.parse.ParseAnalytics;
+
 import java.util.ArrayList;
+
+import mbanje.kurt.fabbutton.FabButton;
 
 
 public class MainActivity extends Activity {
@@ -31,18 +33,18 @@ public class MainActivity extends Activity {
     private Intent serverIntent;
     private LinearLayout atHomeUsersLayout;
     private WifiChangeReceiver wifiChecker;
+    FabButton indeterminate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        wifiChecker = new WifiChangeReceiver();
-        wifiChecker.checkWifiHome(this);
 
+        wifiChecker = new WifiChangeReceiver();
         ImageButton button1;
-        final SwipeRefreshLayout swipeLayout;
 
         button1 = (ImageButton)findViewById(R.id.addButton1);
+        indeterminate = (FabButton) findViewById(R.id.indeterminate);
         mainText = (TextView)findViewById(R.id.mainText);
         atHomeUsersLayout = (LinearLayout)findViewById(R.id.atHomeUsers);
         button1.setOnTouchListener(new View.OnTouchListener() {
@@ -54,17 +56,11 @@ public class MainActivity extends Activity {
             }
         });
 
-        swipeLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_container);
-        swipeLayout.setColorSchemeResources(R.color.orange, R.color.blue, R.color.green);
-        swipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+        indeterminate.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onRefresh() {
-                new Handler().postDelayed(new Runnable() {
-                    @Override public void run() {
-                        requestToServer(ServerAccess.ServerAction.GET_FRIENDS_HOME);
-                        swipeLayout.setRefreshing(false);
-                    }
-                }, 1000);
+            public void onClick(View v) {
+                indeterminate.showProgress(true);
+                requestToServer(ServerAccess.ServerAction.GET_FRIENDS_HOME);
             }
         });
 
@@ -73,8 +69,14 @@ public class MainActivity extends Activity {
         serverBroadcastFilter.addCategory(Intent.CATEGORY_DEFAULT);
         serverBroadcastReceiver = new ServerBroadcastReceiver();
         LocalBroadcastManager.getInstance(this).registerReceiver(serverBroadcastReceiver, serverBroadcastFilter);
+    }
 
-        requestToServer(ServerAccess.ServerAction.GET_FRIENDS_HOME);
+    @Override
+    protected void onResume() {
+        super.onResume();
+        ParseAnalytics.trackAppOpenedInBackground(getIntent()); //Parse analytics for app opens
+        requestToServer(ServerAccess.ServerAction.GET_FRIENDS_HOME); //get list of friends who are home
+        wifiChecker.checkWifiHome(this); //report to server if I am home.
     }
 
     public void changeText(ArrayList<AtHomeUser> friendsHome){
@@ -140,6 +142,7 @@ public class MainActivity extends Activity {
             }else if(action.equals(ServerAccess.ServerAction.GET_FRIENDS_HOME.toString())){
                 ArrayList<AtHomeUser> friendsHome = intent.getParcelableArrayListExtra("data");
                 changeText(friendsHome);
+                indeterminate.showProgress(false);
             }else if(action.equals(ServerAccess.ServerAction.GET_USER.toString())){
 
             }

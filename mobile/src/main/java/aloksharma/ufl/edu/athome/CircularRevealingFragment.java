@@ -3,6 +3,8 @@ package aloksharma.ufl.edu.athome;
 import android.animation.Animator;
 import android.app.Activity;
 import android.app.Fragment;
+import android.app.FragmentManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -57,10 +59,12 @@ public class CircularRevealingFragment extends Fragment
                 int radius = (int)Math.hypot(right, bottom);
 
                 // TODO: Handle animation for pre lollipop devices.
-                Animator reveal = ViewAnimationUtils.createCircularReveal(v, cx, cy, 0, radius);
-                reveal.setInterpolator(new DecelerateInterpolator(1.5f));
-                reveal.setDuration(700);
-                reveal.start();
+                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    Animator reveal = ViewAnimationUtils.createCircularReveal(v, cx, cy, 0, radius);
+                    reveal.setInterpolator(new DecelerateInterpolator(1.5f));
+                    reveal.setDuration(700);
+                    reveal.start();
+                }
             }
         });
 
@@ -79,7 +83,10 @@ public class CircularRevealingFragment extends Fragment
      */
     public void removeYourself(){
         final CircularRevealingFragment mfragment = this;
-        Animator unreveal = mfragment.prepareUnrevealAnimator(cx, cy);
+        Animator unreveal = null;
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            unreveal = mfragment.prepareUnrevealAnimator(cx, cy);
+        }
         if(unreveal != null) {
             unreveal.addListener(new Animator.AnimatorListener() {
                 @Override
@@ -89,9 +96,12 @@ public class CircularRevealingFragment extends Fragment
                 @Override
                 public void onAnimationEnd(Animator animation) {
                     // removeFragment the fragment only when the animation finishes
-                    getFragmentManager().popBackStack();
-                    getFragmentManager().beginTransaction().remove(mfragment).commit();
-                    getFragmentManager().executePendingTransactions(); //Prevents the flashing.
+                    FragmentManager fragmentManager = getFragmentManager();
+                    if(fragmentManager != null){
+                        getFragmentManager().popBackStack();
+                        getFragmentManager().beginTransaction().remove(mfragment).commit();
+                        getFragmentManager().executePendingTransactions(); //Prevents the flashing.
+                    }
                 }
 
                 @Override
@@ -103,6 +113,13 @@ public class CircularRevealingFragment extends Fragment
                 }
             });
             unreveal.start();
+        }else{
+            FragmentManager fragmentManager = getFragmentManager();
+            if(fragmentManager != null){
+                getFragmentManager().popBackStack();
+                getFragmentManager().beginTransaction().remove(mfragment).commit();
+                getFragmentManager().executePendingTransactions(); //Prevents the flashing.
+            }
         }
     }
 

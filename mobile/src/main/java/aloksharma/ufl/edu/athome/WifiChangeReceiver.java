@@ -31,7 +31,7 @@ public class WifiChangeReceiver extends BroadcastReceiver {
 
     public void checkWifiHome(Context context){
         ConnectivityManager connectionManager = (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetwork = connectionManager.getActiveNetworkInfo(); //TODO activeNetwork can be null
+        NetworkInfo activeNetwork = connectionManager.getActiveNetworkInfo();
         if(activeNetwork != null){
             boolean isWiFi = activeNetwork.getType() == ConnectivityManager.TYPE_WIFI;
             boolean isConnected = activeNetwork.isConnected();
