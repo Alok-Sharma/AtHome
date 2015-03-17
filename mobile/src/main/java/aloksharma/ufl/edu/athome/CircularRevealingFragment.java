@@ -2,27 +2,42 @@ package aloksharma.ufl.edu.athome;
 
 import android.animation.Animator;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.SharedPreferences;
+import android.net.wifi.WifiConfiguration;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
+import android.widget.Button;
+
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Created by Alok on 2/26/2015.
  */
 
-public class CircularRevealingFragment extends Fragment
-{
+public class CircularRevealingFragment extends Fragment{
     int cx, cy;
+    WifiChangeReceiver wifiChecker;
 
-    public CircularRevealingFragment()
-    {
+    public CircularRevealingFragment(){
+
     }
 
     public static CircularRevealingFragment newInstance(int centerX, int centerY, int color)
@@ -42,7 +57,6 @@ public class CircularRevealingFragment extends Fragment
     {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
         rootView.setBackgroundColor(getArguments().getInt("color"));
-
         // To run the animation as soon as the view is layout in the view hierarchy we add this
         // listener and removeFragment it
         // as soon as it runs to prevent multiple animations if the view changes bounds
@@ -67,6 +81,9 @@ public class CircularRevealingFragment extends Fragment
                 }
             }
         });
+
+        Button setWifiButton = (Button)rootView.findViewById(R.id.wifiButton);
+        setWifiButton.setText("Current Home Wifi: " + PreferenceManager.getDefaultSharedPreferences(getActivity()).getString("home_wifi", "No Wifi set"));
 
         return rootView;
     }
@@ -172,6 +189,64 @@ public class CircularRevealingFragment extends Fragment
                 radius = distances[i];
         }
         return radius;
+    }
+
+    public void setWifi(Context context, final Button view){
+        final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        wifiChecker = new WifiChangeReceiver();
+        HashMap<String, Integer> wifiPriority = new HashMap<>();
+        TreeMap<String, Integer> sortedWifi;
+        final List<WifiConfiguration> savedWifiList = wifiChecker.getSavedWifiList(context);
+        final Iterator<WifiConfiguration> iterator =  savedWifiList.iterator();
+        WifiConfiguration tempWifi;
+        while(iterator.hasNext()){
+            tempWifi = iterator.next();
+            Log.d("guitar", "ssid: " + tempWifi.SSID);
+            wifiPriority.put(tempWifi.SSID, tempWifi.priority);
+        }
+
+        sortedWifi = SortByValue(wifiPriority);
+        Log.d("guitar", "" + sortedWifi);
+        final CharSequence[] sortedWifiKeys = sortedWifi.keySet().toArray(new CharSequence[sortedWifi.size()]);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle("Select your Home WiFi");
+        builder.setItems(sortedWifiKeys, new DialogInterface.OnClickListener() {
+            SharedPreferences.Editor prefEditor;
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Log.d("guitar", "Selected wifi: " + sortedWifiKeys[which]);
+                prefEditor = sharedPreferences.edit();
+                prefEditor.putString("home_wifi", sortedWifiKeys[which].toString());
+                prefEditor.commit();
+                view.setText("Home WiFi: " + sortedWifiKeys[which].toString());
+            }
+        });
+        builder.show();
+    }
+
+    public static TreeMap<String, Integer> SortByValue(HashMap<String, Integer> wifiPriority) {
+        ValueComparator vc =  new ValueComparator(wifiPriority);
+        TreeMap<String,Integer> sortedMap = new TreeMap<>(vc);
+        sortedMap.putAll(wifiPriority);
+        return sortedMap;
+    }
+}
+
+class ValueComparator implements Comparator<String> {
+
+    Map<String, Integer> map;
+
+    public ValueComparator(Map<String, Integer> base) {
+        this.map = base;
+    }
+
+    public int compare(String a, String b) {
+        if (map.get(a) >= map.get(b)) {
+            return -1;
+        } else {
+            return 1;
+        } // returning 0 would merge keys
     }
 }
 

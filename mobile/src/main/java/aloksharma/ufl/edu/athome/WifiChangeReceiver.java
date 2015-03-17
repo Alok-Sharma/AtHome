@@ -5,15 +5,18 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.preference.PreferenceManager;
 import android.util.Log;
+
+import java.util.List;
 
 /**
  * Created by Alok on 3/10/2015.
  */
 public class WifiChangeReceiver extends BroadcastReceiver {
-    String homeWifi = "d8:eb:97:1a:1f:2b";
     Intent serverIntent;
 
     @Override
@@ -30,6 +33,7 @@ public class WifiChangeReceiver extends BroadcastReceiver {
     }
 
     public void checkWifiHome(Context context){
+        String homeWifi = PreferenceManager.getDefaultSharedPreferences(context).getString("home_wifi", "");
         ConnectivityManager connectionManager = (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = connectionManager.getActiveNetworkInfo();
         if(activeNetwork != null){
@@ -59,12 +63,17 @@ public class WifiChangeReceiver extends BroadcastReceiver {
     }
 
     public String getWifiName(Context context) {
-        String bssid = "none";
+        String ssid = "none";
         WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
         WifiInfo wifiInfo = wifiManager.getConnectionInfo();
-//        bssid = wifiInfo.getSSID(); //gets wifi name. Is not unique.
-        bssid = wifiInfo.getBSSID(); //gets MAC address of router. Should be unique.
-        return bssid;
+        ssid = wifiInfo.getSSID(); //gets wifi name. Is not unique.
+//        bssid = wifiInfo.getBSSID(); //gets MAC address of router. Should be unique.
+        return ssid;
+    }
+
+    public List<WifiConfiguration> getSavedWifiList(Context context){
+        WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+        return wifiManager.getConfiguredNetworks();
     }
 }
 

@@ -5,13 +5,16 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -26,7 +29,7 @@ import mbanje.kurt.fabbutton.FabButton;
 public class MainActivity extends Activity {
 
     private TextView mainText;
-    private CircularRevealingFragment mfragment;
+    private CircularRevealingFragment circularFragment;
     private float x,y;
     private Boolean fragUp = false;
     private ServerBroadcastReceiver serverBroadcastReceiver;
@@ -34,11 +37,15 @@ public class MainActivity extends Activity {
     private LinearLayout atHomeUsersLayout;
     private WifiChangeReceiver wifiChecker;
     FabButton indeterminate;
+    private SharedPreferences sharedPreferences;
+    private SharedPreferences.Editor prefEditor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         wifiChecker = new WifiChangeReceiver();
         ImageButton button1;
@@ -106,14 +113,14 @@ public class MainActivity extends Activity {
     {
         fragUp = true;
         int randomColor = Color.GREEN;
-        mfragment = CircularRevealingFragment.newInstance((int) x, (int) y, randomColor);
-        getFragmentManager().beginTransaction().add(android.R.id.content, mfragment).addToBackStack(null).commit();
+        circularFragment = CircularRevealingFragment.newInstance((int) x, (int) y, randomColor);
+        getFragmentManager().beginTransaction().add(android.R.id.content, circularFragment).addToBackStack(null).commit();
     }
 
     @Override
     public void onBackPressed(){
         if(fragUp){
-            removeFragment(mfragment.getView());
+            removeFragment(circularFragment.getView());
         }else{
             super.onBackPressed();
         }
@@ -124,7 +131,14 @@ public class MainActivity extends Activity {
      */
     public void removeFragment(View v){
         fragUp = false;
-        mfragment.removeYourself();
+        circularFragment.removeYourself();
+    }
+
+    /*
+    Called by the Wifi button in the fragment_main.xml
+     */
+    public void setWifi(View v){
+        circularFragment.setWifi(this, (Button)v);
     }
 
     private void requestToServer(ServerAccess.ServerAction serverAction){
