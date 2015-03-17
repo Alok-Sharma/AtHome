@@ -8,6 +8,7 @@
     android:orientation="vertical"
     tools:context=".MainActivity"
     tools:ignore="MergeRootFrame"
+    android:background="#ff0099cc"
     >
 
     <ImageButton

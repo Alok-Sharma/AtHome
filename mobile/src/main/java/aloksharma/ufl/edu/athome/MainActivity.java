@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
@@ -101,7 +100,7 @@ public class MainActivity extends Activity {
             TextView tv = new TextView(this);
             tv.setGravity(Gravity.CENTER);
             tv.setPadding(5,0,5,0);
-            tv.setText(friendsHome.get(i).getFirstName());
+            tv.setText(friendsHome.get(i).getFirstName() + ";");
             atHomeUsersLayout.addView(tv);
         }
     }
@@ -112,7 +111,7 @@ public class MainActivity extends Activity {
     public void addFragment(final View v)
     {
         fragUp = true;
-        int randomColor = Color.GREEN;
+        int randomColor = 0xFFC33C54;
         circularFragment = CircularRevealingFragment.newInstance((int) x, (int) y, randomColor);
         getFragmentManager().beginTransaction().add(android.R.id.content, circularFragment).addToBackStack(null).commit();
     }

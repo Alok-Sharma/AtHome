@@ -2,15 +2,19 @@ package aloksharma.ufl.edu.athome;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
 import com.parse.LogInCallback;
 import com.parse.ParseException;
+import com.parse.ParseObject;
 import com.parse.ParseUser;
 
 /**
@@ -23,12 +27,16 @@ public class LoginActivity extends Activity {
     protected Button signIn;
     protected Button signUp;
     Intent toMainActivity;
+    SharedPreferences sharedPref;
+    SharedPreferences.Editor sharedPrefEditor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         toMainActivity = new Intent(this, MainActivity.class);
+
+        sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
 
         View someView = findViewById(R.id.login);
         View root = someView.getRootView();
@@ -48,6 +56,10 @@ public class LoginActivity extends Activity {
                         if (user != null) {
                             // Hooray! The user is logged in.
                             Toast.makeText(LoginActivity.this, "Successful sign-in", Toast.LENGTH_LONG).show();
+                            sharedPrefEditor = sharedPref.edit();
+                            sharedPrefEditor.putString("user_email", ParseUser.getCurrentUser().getEmail());
+                            sharedPrefEditor.commit();
+                            fetchName(ParseUser.getCurrentUser().getEmail());
                             startActivity(toMainActivity);
                         } else {
                             // Signup failed. Look at the ParseException to see what happened.
@@ -64,9 +76,14 @@ public class LoginActivity extends Activity {
                 startActivity(takeRegPage);
             }
         });
+    }
 
-
-
+    private void fetchName(String email){
+        ServerAccess serverAccess = new ServerAccess();
+        ParseObject userObject = serverAccess.getUser(email);
+        sharedPrefEditor.putString("user_fname", userObject.getString("First_Name"));
+        sharedPrefEditor.putString("user_lname", userObject.getString("Last_Name"));
+        sharedPrefEditor.commit();
     }
 
     @Override

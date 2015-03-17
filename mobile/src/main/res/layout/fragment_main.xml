@@ -16,6 +16,26 @@
         android:text="WiFi"
         android:onClick="setWifi"/>
 
+    <!--<ToggleButton-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:textSize="15dp"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:id="@+id/invisibleButton"-->
+        <!--android:layout_centerVertical="true"-->
+        <!--android:layout_centerHorizontal="true"-->
+        <!--android:gravity="center"-->
+        <!--android:text="Visible"-->
+        <!--android:onClick="setWifi"/>-->
+
+    <Switch
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/wifiButton"
+        android:layout_alignLeft="@+id/wifiButton"
+        android:layout_alignStart="@+id/wifiButton"
+        android:id="@+id/invisibleButton"
+        android:text="Set invisibility"/>
+
     <ImageButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -26,5 +46,14 @@
         android:layout_alignParentLeft="true"
         android:src="@drawable/ic_arrow_back_black_36dp"
         android:background="@null"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Large Text"
+        android:id="@+id/settingsName"
+        android:layout_below="@+id/removeButton"
+        android:layout_centerHorizontal="true" />
 
 </RelativeLayout>

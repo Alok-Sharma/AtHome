@@ -20,6 +20,7 @@ import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.Button;
+import android.widget.TextView;
 
 import java.util.Comparator;
 import java.util.HashMap;
@@ -82,8 +83,11 @@ public class CircularRevealingFragment extends Fragment{
             }
         });
 
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getContext());
         Button setWifiButton = (Button)rootView.findViewById(R.id.wifiButton);
-        setWifiButton.setText("Current Home Wifi: " + PreferenceManager.getDefaultSharedPreferences(getActivity()).getString("home_wifi", "No Wifi set"));
+        setWifiButton.setText("Home Wifi: " + sharedPreferences.getString("home_wifi", "No Wifi set"));
+        TextView nameText = (TextView)rootView.findViewById(R.id.settingsName);
+        nameText.setText(sharedPreferences.getString("user_fname", "") + " " +sharedPreferences.getString("user_lname", ""));
 
         return rootView;
     }
@@ -191,7 +195,7 @@ public class CircularRevealingFragment extends Fragment{
         return radius;
     }
 
-    public void setWifi(Context context, final Button view){
+    public void setWifi(final Context context, final Button view){
         final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         wifiChecker = new WifiChangeReceiver();
         HashMap<String, Integer> wifiPriority = new HashMap<>();
@@ -201,7 +205,6 @@ public class CircularRevealingFragment extends Fragment{
         WifiConfiguration tempWifi;
         while(iterator.hasNext()){
             tempWifi = iterator.next();
-            Log.d("guitar", "ssid: " + tempWifi.SSID);
             wifiPriority.put(tempWifi.SSID, tempWifi.priority);
         }
 
@@ -220,6 +223,7 @@ public class CircularRevealingFragment extends Fragment{
                 prefEditor.putString("home_wifi", sortedWifiKeys[which].toString());
                 prefEditor.commit();
                 view.setText("Home WiFi: " + sortedWifiKeys[which].toString());
+                wifiChecker.checkWifiHome(context);
             }
         });
         builder.show();
