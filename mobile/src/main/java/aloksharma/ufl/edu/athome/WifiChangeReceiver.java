@@ -34,6 +34,7 @@ public class WifiChangeReceiver extends BroadcastReceiver {
 
     public void checkWifiHome(Context context){
         String homeWifi = PreferenceManager.getDefaultSharedPreferences(context).getString("home_wifi", "");
+//        String homeWifi = PreferenceManager.getDefaultSharedPreferences(context).getString("home_wifi_id", ""); //ALOKIMP
         ConnectivityManager connectionManager = (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = connectionManager.getActiveNetworkInfo();
         if(activeNetwork != null){
@@ -43,6 +44,7 @@ public class WifiChangeReceiver extends BroadcastReceiver {
             String currentWifi;
             if(isWiFi && isConnected){
                 currentWifi = getWifiName(context);
+//                currentWifi = getWifiID(context); //ALOKIMP
                 Log.d("guitar", "broadcast bssid " + currentWifi);
                 if(currentWifi.equals(homeWifi)){
                     //at home
