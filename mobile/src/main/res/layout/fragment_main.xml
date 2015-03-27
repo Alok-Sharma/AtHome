@@ -28,10 +28,10 @@
 
     <RelativeLayout
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
+        android:layout_height="wrap_content"
         android:layout_below="@+id/settingsName"
         android:layout_centerHorizontal="true"
-        android:layout_above="@+id/wifiButton"
+        android:id="@+id/profileImageLayout"
         android:background="@color/bg_settings_profile"
         >
 
@@ -45,27 +45,65 @@
             android:layout_centerHorizontal="true" />
 
     </RelativeLayout>
-
-    <Button
-        android:layout_width="wrap_content"
-        android:textSize="15dp"
+    <RelativeLayout
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/wifiButton"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true"
-        android:gravity="center"
-        android:text="WiFi"
-        android:onClick="setWifi"/>
+        android:orientation="vertical"
+        android:layout_below="@+id/profileImageLayout"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:paddingBottom="5dp"
+        android:id="@+id/wifiButtonLayout">
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Home WiFi"
+            android:textSize="20dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"/>
 
-    <Switch
-        android:layout_width="wrap_content"
+        <Button
+            android:layout_width="wrap_content"
+            android:textSize="15dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/wifiButton"
+            android:gravity="center"
+            android:text="WiFi"
+            android:onClick="setWifi"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"/>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/wifiButton"
-        android:layout_alignLeft="@+id/wifiButton"
-        android:layout_alignStart="@+id/wifiButton"
-        android:id="@+id/invisibleSwitch"
-        android:text="Set invisibility"
-        />
+        android:orientation="vertical"
+        android:layout_below="@+id/wifiButtonLayout"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Enable Invisibility"
+            android:textSize="20dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"/>
+
+        <Switch
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/invisibleSwitch"
+            android:textOff="Off"
+            android:textOn="On"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            />
+
+    </RelativeLayout>
 
 </RelativeLayout>

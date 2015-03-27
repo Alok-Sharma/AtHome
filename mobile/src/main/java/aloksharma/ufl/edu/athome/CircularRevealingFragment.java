@@ -93,7 +93,7 @@ public class CircularRevealingFragment extends Fragment{
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getContext());
 
         Button setWifiButton = (Button)rootView.findViewById(R.id.wifiButton);
-        setWifiButton.setText("Home Wifi: " + sharedPreferences.getString("home_wifi", "No Wifi set"));
+        setWifiButton.setText(sharedPreferences.getString("home_wifi", "No Wifi set"));
 
         TextView nameText = (TextView)rootView.findViewById(R.id.settingsName);
         nameText.setText(sharedPreferences.getString("user_fname", "") + " " +sharedPreferences.getString("user_lname", ""));
