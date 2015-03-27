@@ -71,6 +71,14 @@ public class WifiChangeReceiver extends BroadcastReceiver {
         return ssid;
     }
 
+    public String getWifiID(Context context){
+        String bssid = "none";
+        WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+        WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+        bssid = wifiInfo.getBSSID();
+        return bssid;
+    }
+
     public List<WifiConfiguration> getSavedWifiList(Context context){
         WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
         return wifiManager.getConfiguredNetworks();

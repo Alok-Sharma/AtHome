@@ -22,15 +22,17 @@ import java.util.List;
 public class ServerAccess extends IntentService {
 
     public enum ServerAction {
-        GET_USER, ADD_FRIEND, REMOVE_FRIEND, ADD_USER, GET_FRIENDS, GET_FRIENDS_HOME, SET_HOME_STATUS, SET_INVISIBLE
+        GET_USER, ADD_FRIEND, REMOVE_FRIEND, ADD_USER, GET_FRIENDS, GET_FRIENDS_HOME, SET_HOME_STATUS, SET_INVISIBLE,
+        SET_WIFI, GET_WIFI
     }
 
     String userEmail;
     String first_name, last_name;
+    SharedPreferences sharedPreferences;
 
     public ServerAccess() {
         super("ServerAccess");
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getContext());
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getContext());
         userEmail = sharedPreferences.getString("user_email", "");
         first_name = sharedPreferences.getString("user_fname", "");
         last_name  =sharedPreferences.getString("user_lname", "");
@@ -50,7 +52,9 @@ public class ServerAccess extends IntentService {
         if(friendList.size() != 0) {
 
             ParseQuery<ParseObject> friendQuery = new ParseQuery<>("AtHome");
-            friendQuery.whereContainedIn("Email", friendList);
+            friendQuery.whereContainedIn("Email", friendList); //ALOKIMP
+//            String wifi_id = sharedPreferences.getString("home_wifi_id", null);
+//            friendQuery.whereEqualTo("wifi", wifi_id);
 
             try{
                 friends = friendQuery.find();
@@ -135,7 +139,7 @@ public class ServerAccess extends IntentService {
     /*
     Add new user. Returns user object
      */
-    public ParseObject putUser(){
+    public ParseObject putUser(String userEmail, String first_name, String last_name){
         final List friendList = new ArrayList();
         final ParseObject newUser = new ParseObject("AtHome");
         //First we need to check if the object already exists on the server before we put.
@@ -239,6 +243,19 @@ public class ServerAccess extends IntentService {
         }
     }
 
+    public void setHomeWifi(ParseObject userObject){
+        WifiChangeReceiver wifiChangeReceiver = new WifiChangeReceiver();
+        String wifiID = wifiChangeReceiver.getWifiID(this);
+        userObject.put("wifi", wifiID);
+        sharedPreferences.edit().putString("home_wifi_id", wifiID).commit();
+        Log.d("guitar", "saving wifi: " + wifiID);
+        try{
+            userObject.save();
+        }catch (ParseException e){
+            Log.d("guitar", "error pushing wifi: " +e.getMessage());
+        }
+    }
+
     //Receive incoming requests from activities, and send appropriate server request.
     //On receiving response from server, send broadcast back to activity.
     @Override
@@ -257,6 +274,7 @@ public class ServerAccess extends IntentService {
             Log.d("guitarintent", "add friend intent");
         }else if(action.equals(ServerAction.ADD_USER.toString())){
             Log.d("guitarintent", "add user intent");
+            putUser(intent.getStringExtra("email"), intent.getStringExtra("fname"), intent.getStringExtra("lname"));
         }else if(action.equals(ServerAction.GET_FRIENDS_HOME.toString())){
             List<AtHomeUser> friendsHome = getFriendsHome(getUser(userEmail));
             Log.d("guitarintent", "get friends friends home: " + friendsHome);
@@ -273,6 +291,9 @@ public class ServerAccess extends IntentService {
             Log.d("guitarintent", "get user intent");
             ParseObject userObject = getUser(userEmail);
             //Take data out of userobject and send broadcast.
+        }else if(action.equals(ServerAction.SET_WIFI.toString())){
+            Log.d("guitarintent", "get user intent");
+            setHomeWifi(getUser(userEmail));
         }
 
         LocalBroadcastManager.getInstance(this).sendBroadcast(responseIntent);

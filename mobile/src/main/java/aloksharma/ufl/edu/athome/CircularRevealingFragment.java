@@ -244,12 +244,13 @@ public class CircularRevealingFragment extends Fragment{
                 prefEditor = sharedPreferences.edit();
                 prefEditor.putString("home_wifi", sortedWifiKeys[which].toString());
                 prefEditor.commit();
-                view.setText("Home WiFi: " + sortedWifiKeys[which].toString());
+                view.setText(sortedWifiKeys[which].toString());
                 wifiChecker.checkWifiHome(context);
             }
         });
         builder.show();
     }
+
 
     public static TreeMap<String, Integer> SortByValue(HashMap<String, Integer> wifiPriority) {
         ValueComparator vc =  new ValueComparator(wifiPriority);

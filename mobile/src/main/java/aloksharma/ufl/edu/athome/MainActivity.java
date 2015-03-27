@@ -141,6 +141,7 @@ public class MainActivity extends Activity {
      */
     public void setWifi(View v){
         circularFragment.setWifi(this, (Button)v);
+//        requestToServer(ServerAccess.ServerAction.SET_WIFI); //ALOKIMP
     }
 
     private void requestToServer(ServerAccess.ServerAction serverAction){
