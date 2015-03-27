@@ -26,28 +26,6 @@
         android:paddingRight="20dp"
         android:paddingEnd="20dp"/>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Looking for\nwho is home.."
-        android:textSize="48dp"
-        android:id="@+id/mainText"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true"
-        android:gravity="center"/>
-
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/mainText"
-        android:layout_centerHorizontal="true"
-        android:id="@+id/atHomeUsers"
-        android:gravity="center">
-
-    </LinearLayout>
-
     <view
         android:layout_width="45dp"
         android:layout_height="45dp"
@@ -60,13 +38,44 @@
         android:indeterminate="true"
         android:max="100"
         app:fbb_autoStart="true"
-        app:fbb_progressColor="#0099cc"
-        app:fbb_progressWidthRatio="0.15"
+        app:fbb_progressColor="@color/bg_settings"
+        app:fbb_progressWidthRatio="0.20"
         android:layout_centerHorizontal="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
         android:minHeight="@dimen/abc_action_button_min_height_material"
         android:minWidth="@dimen/abc_action_button_min_width_material"
         />
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="Looking for\nwho is home.."
+            android:textSize="48dp"
+            android:id="@+id/mainText"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="150dp" />
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/mainText"
+            android:layout_centerHorizontal="true"
+            android:id="@+id/atHomeUsers"
+            android:gravity="center">
+
+        </LinearLayout>
+    </RelativeLayout>
 
 </RelativeLayout>

@@ -22,7 +22,7 @@ import java.util.List;
 public class ServerAccess extends IntentService {
 
     public enum ServerAction {
-        GET_USER, ADD_FRIEND, REMOVE_FRIEND, ADD_USER, GET_FRIENDS, GET_FRIENDS_HOME, SET_HOME_STATUS
+        GET_USER, ADD_FRIEND, REMOVE_FRIEND, ADD_USER, GET_FRIENDS, GET_FRIENDS_HOME, SET_HOME_STATUS, SET_INVISIBLE
     }
 
     String userEmail;
@@ -266,6 +266,9 @@ public class ServerAccess extends IntentService {
         }else if(action.equals(ServerAction.SET_HOME_STATUS.toString())){
             Log.d("guitarintent", "set home status intent: " + intent.getBooleanExtra("server_action_arg", false));
             setAtHomeStatus(getUser(userEmail), intent.getBooleanExtra("server_action_arg", false));
+        }else if(action.equals(ServerAction.SET_INVISIBLE.toString())){
+            Log.d("guitarintent", "set invisible: ");
+            //TODO: invisible
         }else if(action.equals(ServerAction.GET_USER.toString())){
             Log.d("guitarintent", "get user intent");
             ParseObject userObject = getUser(userEmail);

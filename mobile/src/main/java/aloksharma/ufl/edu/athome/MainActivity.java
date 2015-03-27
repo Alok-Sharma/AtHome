@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
@@ -97,11 +96,15 @@ public class MainActivity extends Activity {
         }
 
         for(int i = 0; i < numAtHome; i++){
-            TextView tv = new TextView(this);
-            tv.setGravity(Gravity.CENTER);
-            tv.setPadding(5,0,5,0);
-            tv.setText(friendsHome.get(i).getFirstName() + ";");
-            atHomeUsersLayout.addView(tv);
+//            TextView tv = new TextView(this);
+            View homeUserView = getLayoutInflater().inflate(R.layout.component_users, atHomeUsersLayout, false);
+//            tv.setGravity(Gravity.CENTER);
+//            tv.setPadding(5,0,5,0);
+//            tv.setText(friendsHome.get(i).getFirstName());
+//            atHomeUsersLayout.addView(tv);
+            atHomeUsersLayout.addView(homeUserView);
+            TextView homeUserName = (TextView)homeUserView.findViewById(R.id.atHomeUserText);
+            homeUserName.setText(friendsHome.get(i).getFirstName());
         }
     }
 
@@ -111,8 +114,8 @@ public class MainActivity extends Activity {
     public void addFragment(final View v)
     {
         fragUp = true;
-        int randomColor = 0xFFC33C54;
-        circularFragment = CircularRevealingFragment.newInstance((int) x, (int) y, randomColor);
+        int fragmentColor = 0xFFC33C54;
+        circularFragment = CircularRevealingFragment.newInstance((int) x, (int) y, fragmentColor);
         getFragmentManager().beginTransaction().add(android.R.id.content, circularFragment).addToBackStack(null).commit();
     }
 

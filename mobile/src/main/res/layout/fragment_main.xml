@@ -3,38 +3,8 @@
     android:layout_height="match_parent"  tools:context=".MainActivity$PlaceholderFragment"
     android:id="@+id/rel"
     android:clickable="true"
+    android:elevation="10dp"
     >
-
-    <Button
-        android:layout_width="wrap_content"
-        android:textSize="15dp"
-        android:layout_height="wrap_content"
-        android:id="@+id/wifiButton"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true"
-        android:gravity="center"
-        android:text="WiFi"
-        android:onClick="setWifi"/>
-
-    <!--<ToggleButton-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:textSize="15dp"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:id="@+id/invisibleButton"-->
-        <!--android:layout_centerVertical="true"-->
-        <!--android:layout_centerHorizontal="true"-->
-        <!--android:gravity="center"-->
-        <!--android:text="Visible"-->
-        <!--android:onClick="setWifi"/>-->
-
-    <Switch
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/wifiButton"
-        android:layout_alignLeft="@+id/wifiButton"
-        android:layout_alignStart="@+id/wifiButton"
-        android:id="@+id/invisibleButton"
-        android:text="Set invisibility"/>
 
     <ImageButton
         android:layout_width="wrap_content"
@@ -55,5 +25,47 @@
         android:id="@+id/settingsName"
         android:layout_below="@+id/removeButton"
         android:layout_centerHorizontal="true" />
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_below="@+id/settingsName"
+        android:layout_centerHorizontal="true"
+        android:layout_above="@+id/wifiButton"
+        android:background="@color/bg_settings_profile"
+        >
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/imageView"
+            android:layout_gravity="center"
+            android:src="@drawable/com_facebook_profile_picture_blank_portrait"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true" />
+
+    </RelativeLayout>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:textSize="15dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/wifiButton"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:gravity="center"
+        android:text="WiFi"
+        android:onClick="setWifi"/>
+
+
+    <Switch
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/wifiButton"
+        android:layout_alignLeft="@+id/wifiButton"
+        android:layout_alignStart="@+id/wifiButton"
+        android:id="@+id/invisibleSwitch"
+        android:text="Set invisibility"
+        />
 
 </RelativeLayout>

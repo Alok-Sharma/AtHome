@@ -20,6 +20,8 @@ import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.Button;
+import android.widget.CompoundButton;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import java.util.Comparator;
@@ -31,6 +33,11 @@ import java.util.TreeMap;
 
 /**
  * Created by Alok on 2/26/2015.
+ * The settings fragment. Things to put in:
+ *  - Current wifi.
+ *  - Invisibility.
+ *  - Logout
+ *
  */
 
 public class CircularRevealingFragment extends Fragment{
@@ -84,10 +91,25 @@ public class CircularRevealingFragment extends Fragment{
         });
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getContext());
+
         Button setWifiButton = (Button)rootView.findViewById(R.id.wifiButton);
         setWifiButton.setText("Home Wifi: " + sharedPreferences.getString("home_wifi", "No Wifi set"));
+
         TextView nameText = (TextView)rootView.findViewById(R.id.settingsName);
         nameText.setText(sharedPreferences.getString("user_fname", "") + " " +sharedPreferences.getString("user_lname", ""));
+
+        final Switch invisibleSwitch = (Switch)rootView.findViewById(R.id.invisibleSwitch);
+        //check for previously set value of invisibility.
+        invisibleSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked){
+                    Log.d("guitar", "ischecked true");
+                }else{
+                    Log.d("guitar", "ischecked false");
+                }
+            }
+        });
 
         return rootView;
     }
