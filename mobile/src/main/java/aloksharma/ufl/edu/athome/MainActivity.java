@@ -9,10 +9,8 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -87,7 +85,10 @@ public class MainActivity extends Activity {
     public void changeText(ArrayList<AtHomeUser> friendsHome){
         atHomeUsersLayout.removeAllViews();
         int numAtHome = friendsHome.size();
-        if(numAtHome == 0){
+
+        if(sharedPreferences.getString("home_wifi_id", null) == null){
+            mainText.setText("Pssst,\ntell me your\nhome wifi\nin the settings.");
+        }else if(numAtHome == 0){
             mainText.setText("Nope,\nno one\nis home.");
         }else if (numAtHome == 1){
             mainText.setText("Yep,\n1 person\nis home.");
@@ -140,8 +141,11 @@ public class MainActivity extends Activity {
     Called by the Wifi button in the fragment_main.xml
      */
     public void setWifi(View v){
-        circularFragment.setWifi(this, (Button)v);
-//        requestToServer(ServerAccess.ServerAction.SET_WIFI); //ALOKIMP
+//        circularFragment.setWifi(this, (Button)v);
+        requestToServer(ServerAccess.ServerAction.SET_WIFI); //ALOKIMP
+        wifiChecker.checkWifiHome(this);
+        requestToServer(ServerAccess.ServerAction.GET_FRIENDS_HOME);
+
     }
 
     private void requestToServer(ServerAccess.ServerAction serverAction){
@@ -155,7 +159,7 @@ public class MainActivity extends Activity {
         public void onReceive(Context context, Intent intent) {
             String action = intent.getStringExtra("server_action");
             if(action.equals(ServerAccess.ServerAction.GET_FRIENDS.toString())){
-                Log.d("guitar", "activity received friends: " + intent.getStringArrayListExtra("data"));
+
             }else if(action.equals(ServerAccess.ServerAction.GET_FRIENDS_HOME.toString())){
                 ArrayList<AtHomeUser> friendsHome = intent.getParcelableArrayListExtra("data");
                 changeText(friendsHome);

@@ -38,6 +38,13 @@ public class LoginActivity extends Activity {
 
         sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
 
+        if(ParseUser.getCurrentUser() != null){
+            sharedPrefEditor = sharedPref.edit();
+            sharedPrefEditor.putString("user_email", ParseUser.getCurrentUser().getEmail());
+            sharedPrefEditor.commit();
+            fetchName(ParseUser.getCurrentUser().getEmail());
+            startActivity(toMainActivity);
+        }
         View someView = findViewById(R.id.login);
         View root = someView.getRootView();
         root.setBackgroundColor(getResources().getColor(android.R.color.holo_blue_dark));
@@ -83,6 +90,7 @@ public class LoginActivity extends Activity {
         ParseObject userObject = serverAccess.getUser(email);
         sharedPrefEditor.putString("user_fname", userObject.getString("First_Name"));
         sharedPrefEditor.putString("user_lname", userObject.getString("Last_Name"));
+        sharedPrefEditor.putString("home_wifi_id", userObject.getString("wifi"));
         sharedPrefEditor.commit();
     }
 

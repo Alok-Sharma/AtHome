@@ -15,6 +15,7 @@ public class AtHomeUser implements Parcelable{
     private String email;
     private List<String> friendList;
     private Boolean status;
+    private String wifi;
 
     public void setFirstName(String first_name){
         this.first_name = first_name;
@@ -26,6 +27,14 @@ public class AtHomeUser implements Parcelable{
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public void setWifi(String wifi) {
+        this.wifi = wifi;
+    }
+
+    public String getWifi() {
+        return wifi;
     }
 
     public void setStatus(boolean status) {
@@ -55,6 +64,7 @@ public class AtHomeUser implements Parcelable{
     public boolean getStatus(){
         return status;
     }
+
 
     public AtHomeUser(){
 

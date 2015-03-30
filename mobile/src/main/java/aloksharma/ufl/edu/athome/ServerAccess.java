@@ -22,20 +22,17 @@ import java.util.List;
 public class ServerAccess extends IntentService {
 
     public enum ServerAction {
-        GET_USER, ADD_FRIEND, REMOVE_FRIEND, ADD_USER, GET_FRIENDS, GET_FRIENDS_HOME, SET_HOME_STATUS, SET_INVISIBLE,
+        GET_USER, ADD_USER, GET_FRIENDS, GET_FRIENDS_HOME, SET_HOME_STATUS, SET_INVISIBLE,
         SET_WIFI, GET_WIFI
     }
 
     String userEmail;
-    String first_name, last_name;
     SharedPreferences sharedPreferences;
 
     public ServerAccess() {
         super("ServerAccess");
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getContext());
         userEmail = sharedPreferences.getString("user_email", "");
-        first_name = sharedPreferences.getString("user_fname", "");
-        last_name  =sharedPreferences.getString("user_lname", "");
     }
 
     /*
@@ -52,9 +49,10 @@ public class ServerAccess extends IntentService {
         if(friendList.size() != 0) {
 
             ParseQuery<ParseObject> friendQuery = new ParseQuery<>("AtHome");
-            friendQuery.whereContainedIn("Email", friendList); //ALOKIMP
-//            String wifi_id = sharedPreferences.getString("home_wifi_id", null);
-//            friendQuery.whereEqualTo("wifi", wifi_id);
+//            friendQuery.whereContainedIn("Email", friendList); //ALOKIMP
+            String wifi_id = sharedPreferences.getString("home_wifi_id", null);
+            Log.d("guitar", "looking for wifi: " + wifi_id);
+            friendQuery.whereEqualTo("wifi", wifi_id);
 
             try{
                 friends = friendQuery.find();
@@ -66,13 +64,12 @@ public class ServerAccess extends IntentService {
                     if(friends.get(j).getString("Email").equals(userObject.getString("Email"))){
                         //if found myself in list, update myself in local datastore.
                         friends.get(j).pin();
-                        Log.d("guitar", "when invisible: " + friends.get(j).get("Status"));
                     }else if(friends.get(j).getBoolean("Status")){
                         AtHomeUser atHomeUser = new AtHomeUser();
                         atHomeUser.setEmail(friends.get(j).getString("Email"));
                         atHomeUser.setFirstName(friends.get(j).getString("First_Name"));
                         atHomeUser.setLastName(friends.get(j).getString("Last_Name"));
-
+                        atHomeUser.setWifi(friends.get(j).getString("wifi"));
                         friendsHome.add(atHomeUser);
                     }else{
                         //If friend not home, do nothing.
@@ -166,63 +163,6 @@ public class ServerAccess extends IntentService {
         return newUser;
     }
 
-    /*
-    Add a new friend. Checks if friend exists on server. If exists, add to your friend list, and get added to their list.
-    If friend doesnt exists, send invite. Invite system not yet implemented.
-     */
-    public void addFriend(ParseObject userObject, final String friendEmail){
-        //TODO: send invite.
-        List<ParseObject> friendObjects;
-        final ParseQuery<ParseObject> friendExists = ParseQuery.getQuery("AtHome");
-        friendExists.whereEqualTo("Email", friendEmail);
-        try{
-            friendObjects = friendExists.find();
-            if(friendObjects.size() == 0){
-                //friend doesn't exists, send invite here.
-            }else{
-                userObject.add("FriendList", friendEmail);
-                userObject.pin();
-                userObject.save();
-
-                friendObjects.get(0).add("FriendList", userEmail);
-                //TODO: Save friend object in local datastore? Yes for now.
-                //TODO: friend needs to know they have been added to a friend list, and that their own friend list has changed.
-                friendObjects.get(0).pin();
-                friendObjects.get(0).save();
-            }
-        }catch (ParseException e){
-            Log.d("guitar" , "couldnt add friend: " + e.getMessage());
-        }
-    }
-
-    public void removeFriend(ParseObject userObject, String friendEmail){
-        Log.d("guitar", "attempt to remove " + friendEmail);
-
-        List<ParseObject> friendObjects;
-        List<String> friendList = new ArrayList<>();
-        friendList.add(friendEmail);
-        List<String> userList = new ArrayList<>();
-        userList.add(userEmail);
-        ParseQuery<ParseObject> findFriendQuery = new ParseQuery<>("AtHome");
-        findFriendQuery.whereEqualTo("Email", friendEmail);
-        findFriendQuery.fromLocalDatastore();
-        try{
-            friendObjects = findFriendQuery.find();
-            if(friendObjects.size() != 0){
-                //found the friend to remove.
-                //TODO: friend needs to know their friend list has changed (user has been removed from their friend list).
-                friendObjects.get(0).removeAll("FriendList", userList); //remove user from friend
-                friendObjects.get(0).save();
-                friendObjects.get(0).unpin(); //remove the friend from local store.
-
-                userObject.removeAll("FriendList", friendList); //remove friend from user
-                userObject.save();
-                userObject.pin(); //update local store since friend list is modified.
-            }
-        }catch (ParseException e){
-            Log.d("guitar", "couldnt remove friend: " + e.getMessage());
-        }
-    }
 
     public void setAtHomeStatus(final ParseObject userObject, final Boolean status){
         //first check what we have already told the server from the existing user object. If different, then tell server.
@@ -246,6 +186,7 @@ public class ServerAccess extends IntentService {
     public void setHomeWifi(ParseObject userObject){
         WifiChangeReceiver wifiChangeReceiver = new WifiChangeReceiver();
         String wifiID = wifiChangeReceiver.getWifiID(this);
+        Log.d("guitar", "set home wifi: " + wifiID + " for the user: " + userObject.get("Email"));
         userObject.put("wifi", wifiID);
         sharedPreferences.edit().putString("home_wifi_id", wifiID).commit();
         Log.d("guitar", "saving wifi: " + wifiID);
@@ -270,17 +211,13 @@ public class ServerAccess extends IntentService {
             List<String> friendList = getFriends(getUser(userEmail));
             Log.d("guitarintent", "get friends intent: " + friendList);
             responseIntent.putStringArrayListExtra("data", new ArrayList<>(friendList));
-        }else if(action.equals(ServerAction.ADD_FRIEND.toString())){
-            Log.d("guitarintent", "add friend intent");
         }else if(action.equals(ServerAction.ADD_USER.toString())){
             Log.d("guitarintent", "add user intent");
             putUser(intent.getStringExtra("email"), intent.getStringExtra("fname"), intent.getStringExtra("lname"));
         }else if(action.equals(ServerAction.GET_FRIENDS_HOME.toString())){
             List<AtHomeUser> friendsHome = getFriendsHome(getUser(userEmail));
-            Log.d("guitarintent", "get friends friends home: " + friendsHome);
+            Log.d("guitarintent", "get friends home: " + friendsHome);
             responseIntent.putParcelableArrayListExtra("data", new ArrayList<AtHomeUser>(friendsHome));
-        }else if(action.equals(ServerAction.REMOVE_FRIEND.toString())){
-            Log.d("guitarintent", "remove friend intent");
         }else if(action.equals(ServerAction.SET_HOME_STATUS.toString())){
             Log.d("guitarintent", "set home status intent: " + intent.getBooleanExtra("server_action_arg", false));
             setAtHomeStatus(getUser(userEmail), intent.getBooleanExtra("server_action_arg", false));
