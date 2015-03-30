@@ -66,14 +66,20 @@
 
         <Button
             android:layout_width="wrap_content"
-            android:textSize="15dp"
+            android:textSize="12dp"
             android:layout_height="wrap_content"
             android:id="@+id/wifiButton"
             android:gravity="center"
             android:text="WiFi"
             android:onClick="setWifi"
             android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"/>
+            android:layout_alignParentEnd="true"
+            android:background="@drawable/button_border"
+            android:layout_margin="10dp"
+            android:layout_marginTop="25dp"
+            android:layout_marginBottom="25dp"
+            android:paddingRight="10dp"
+            android:paddingLeft="10dp"/>
 
     </RelativeLayout>
 
@@ -105,5 +111,20 @@
             />
 
     </RelativeLayout>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Logout"
+        android:onClick="logout"
+        android:id="@+id/LogoutButton"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/button_border"
+        android:layout_margin="10dp"
+        android:layout_marginTop="25dp"
+        android:layout_marginBottom="25dp"
+        android:paddingRight="10dp"
+        android:paddingLeft="10dp"/>
 
 </RelativeLayout>

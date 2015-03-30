@@ -35,6 +35,7 @@ public class LoginActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         toMainActivity = new Intent(this, MainActivity.class);
+//        toMainActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
         sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
 
@@ -44,6 +45,7 @@ public class LoginActivity extends Activity {
             sharedPrefEditor.commit();
             fetchName(ParseUser.getCurrentUser().getEmail());
             startActivity(toMainActivity);
+            finish();
         }
         View someView = findViewById(R.id.login);
         View root = someView.getRootView();
@@ -62,12 +64,12 @@ public class LoginActivity extends Activity {
                     public void done(ParseUser user, ParseException e) {
                         if (user != null) {
                             // Hooray! The user is logged in.
-                            Toast.makeText(LoginActivity.this, "Successful sign-in", Toast.LENGTH_LONG).show();
                             sharedPrefEditor = sharedPref.edit();
                             sharedPrefEditor.putString("user_email", ParseUser.getCurrentUser().getEmail());
                             sharedPrefEditor.commit();
                             fetchName(ParseUser.getCurrentUser().getEmail());
                             startActivity(toMainActivity);
+                            finish();
                         } else {
                             // Signup failed. Look at the ParseException to see what happened.
                             Toast.makeText(LoginActivity.this, "Sign-in Failed :"+e.getMessage(), Toast.LENGTH_LONG).show();

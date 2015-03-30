@@ -16,6 +16,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.parse.ParseAnalytics;
+import com.parse.ParseUser;
 
 import java.util.ArrayList;
 
@@ -34,7 +35,6 @@ public class MainActivity extends Activity {
     private WifiChangeReceiver wifiChecker;
     FabButton indeterminate;
     private SharedPreferences sharedPreferences;
-    private SharedPreferences.Editor prefEditor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -146,6 +146,17 @@ public class MainActivity extends Activity {
         wifiChecker.checkWifiHome(this);
         requestToServer(ServerAccess.ServerAction.GET_FRIENDS_HOME);
 
+    }
+
+    /*
+    Called by the logout button in fragment_main.xml
+     */
+    public void logout(View v){
+        ParseUser.logOut();
+        sharedPreferences.edit().clear().commit();
+        Intent toLoginActivity = new Intent(this, LoginActivity.class);
+        startActivity(toLoginActivity);
+        finish();
     }
 
     private void requestToServer(ServerAccess.ServerAction serverAction){
