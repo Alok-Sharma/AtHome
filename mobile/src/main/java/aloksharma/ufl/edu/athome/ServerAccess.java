@@ -23,7 +23,7 @@ public class ServerAccess extends IntentService {
 
     public enum ServerAction {
         GET_USER, ADD_USER, GET_FRIENDS, GET_FRIENDS_HOME, SET_HOME_STATUS, SET_INVISIBLE,
-        SET_WIFI, GET_WIFI
+        SET_WIFI
     }
 
     String userEmail;
@@ -49,7 +49,6 @@ public class ServerAccess extends IntentService {
         if(friendList.size() != 0) {
 
             ParseQuery<ParseObject> friendQuery = new ParseQuery<>("AtHome");
-//            friendQuery.whereContainedIn("Email", friendList); //ALOKIMP
             String wifi_id = sharedPreferences.getString("home_wifi_id", null);
             Log.d("guitar", "looking for wifi: " + wifi_id);
             friendQuery.whereEqualTo("wifi", wifi_id);
@@ -186,14 +185,22 @@ public class ServerAccess extends IntentService {
     public void setHomeWifi(ParseObject userObject){
         WifiChangeReceiver wifiChangeReceiver = new WifiChangeReceiver();
         String wifiID = wifiChangeReceiver.getWifiID(this);
+        String wifiName = wifiChangeReceiver.getWifiName(this);
         Log.d("guitar", "set home wifi: " + wifiID + " for the user: " + userObject.get("Email"));
-        userObject.put("wifi", wifiID);
-        sharedPreferences.edit().putString("home_wifi_id", wifiID).commit();
-        Log.d("guitar", "saving wifi: " + wifiID);
-        try{
-            userObject.save();
-        }catch (ParseException e){
-            Log.d("guitar", "error pushing wifi: " +e.getMessage());
+        if(wifiID != null){
+            userObject.put("wifi", wifiID);
+            userObject.put("wifi_name", wifiName);
+            SharedPreferences.Editor prefEdit = sharedPreferences.edit();
+            prefEdit.putString("home_wifi_id", wifiID);
+            prefEdit.commit();
+
+            Log.d("guitar", "saving wifi: " + wifiID);
+            try{
+                userObject.save();
+                userObject.pin();
+            }catch (ParseException e){
+                Log.d("guitar", "error pushing wifi: " +e.getMessage());
+            }
         }
     }
 
@@ -228,8 +235,8 @@ public class ServerAccess extends IntentService {
             Log.d("guitarintent", "get user intent");
             ParseObject userObject = getUser(userEmail);
             //Take data out of userobject and send broadcast.
-        }else if(action.equals(ServerAction.SET_WIFI.toString())){
-            Log.d("guitarintent", "get user intent");
+        }else if(action.equals(ServerAction.SET_WIFI.toString())) {
+            Log.d("guitarintent", "set wifi intent");
             setHomeWifi(getUser(userEmail));
         }
 

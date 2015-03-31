@@ -153,6 +153,7 @@ public class LoginActivity extends Activity {
         sharedPrefEditor.putString("user_fname", userObject.getString("First_Name"));
         sharedPrefEditor.putString("user_lname", userObject.getString("Last_Name"));
         sharedPrefEditor.putString("home_wifi_id", userObject.getString("wifi"));
+        sharedPrefEditor.putString("home_wifi_name", userObject.getString("wifi_name"));
         sharedPrefEditor.commit();
     }
 

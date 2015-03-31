@@ -69,7 +69,6 @@ public class WifiChangeReceiver extends BroadcastReceiver {
         WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
         WifiInfo wifiInfo = wifiManager.getConnectionInfo();
         ssid = wifiInfo.getSSID(); //gets wifi name. Is not unique.
-//        bssid = wifiInfo.getBSSID(); //gets MAC address of router. Should be unique.
         return ssid;
     }
 
@@ -77,7 +76,7 @@ public class WifiChangeReceiver extends BroadcastReceiver {
         String bssid = "none";
         WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
         WifiInfo wifiInfo = wifiManager.getConnectionInfo();
-        bssid = wifiInfo.getBSSID();
+        bssid = wifiInfo.getBSSID();    //gets wifi ID. Is unique.
         return bssid;
     }
 

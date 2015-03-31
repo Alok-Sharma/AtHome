@@ -12,9 +12,9 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.facebook.Session;
 import com.parse.ParseAnalytics;
@@ -28,7 +28,6 @@ import mbanje.kurt.fabbutton.FabButton;
 public class MainActivity extends Activity {
 
     private TextView mainText;
-    private ImageView profilePic;
     private CircularRevealingFragment circularFragment;
     private float x,y;
     private Boolean fragUp = false;
@@ -145,11 +144,19 @@ public class MainActivity extends Activity {
     Called by the Wifi button in the fragment_main.xml
      */
     public void setWifi(View v){
-//        circularFragment.setWifi(this, (Button)v);
-        requestToServer(ServerAccess.ServerAction.SET_WIFI); //ALOKIMP
-        wifiChecker.checkWifiHome(this);
-        requestToServer(ServerAccess.ServerAction.GET_FRIENDS_HOME);
-
+        if(wifiChecker.getWifiID(this) != null){
+            requestToServer(ServerAccess.ServerAction.SET_WIFI); //ALOKIMP
+            wifiChecker.checkWifiHome(this);
+            requestToServer(ServerAccess.ServerAction.GET_FRIENDS_HOME);
+            String wifi_name = wifiChecker.getWifiName(this);
+            TextView currentWifiText = (TextView)findViewById(R.id.currentWifi);
+            currentWifiText.setText(wifi_name);
+            sharedPreferences.edit().putString("home_wifi_name", wifi_name).commit();
+            Toast.makeText(this, "Changed your home wifi to " + wifi_name, Toast.LENGTH_SHORT).show();
+        }
+        else{
+            Toast.makeText(this, "Not connected to a WiFi.", Toast.LENGTH_SHORT).show();
+        }
     }
 
     /*
@@ -179,14 +186,10 @@ public class MainActivity extends Activity {
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getStringExtra("server_action");
-            if(action.equals(ServerAccess.ServerAction.GET_FRIENDS.toString())){
-
-            }else if(action.equals(ServerAccess.ServerAction.GET_FRIENDS_HOME.toString())){
+            if(action.equals(ServerAccess.ServerAction.GET_FRIENDS_HOME.toString())){
                 ArrayList<AtHomeUser> friendsHome = intent.getParcelableArrayListExtra("data");
                 changeText(friendsHome);
                 indeterminate.showProgress(false);
-            }else if(action.equals(ServerAccess.ServerAction.GET_USER.toString())){
-
             }
         }
     }
