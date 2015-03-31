@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -12,10 +13,16 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.facebook.Request;
+import com.facebook.Response;
+import com.facebook.model.GraphUser;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
+import com.parse.ParseFacebookUtils;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
+
+import java.util.Arrays;
 
 /**
  * Created by Soham Talukdar on 3/13/2015.
@@ -47,6 +54,7 @@ public class LoginActivity extends Activity {
             startActivity(toMainActivity);
             finish();
         }
+
         View someView = findViewById(R.id.login);
         View root = someView.getRootView();
         root.setBackgroundColor(getResources().getColor(android.R.color.holo_blue_dark));
@@ -86,6 +94,58 @@ public class LoginActivity extends Activity {
             }
         });
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        ParseFacebookUtils.finishAuthentication(requestCode, resultCode, data);
+        ParseFacebookUtils.logIn(Arrays.asList("email", ParseFacebookUtils.Permissions.User.ABOUT_ME, ParseFacebookUtils.Permissions.User.EMAIL), this, new LogInCallback() {
+            @Override
+            public void done(ParseUser user, ParseException err) {
+                if (user == null) {
+                    Log.d("MyApp", "Uh oh. The user cancelled the Facebook login.");
+                } else if (user.isNew()) {
+                    Log.d("MyApp", "User signed up and logged in through Facebook! ");
+                    makeMeRequest();
+                } else {
+                    Log.d("MyApp", "User logged in through Facebook! ");
+                    makeMeRequest();
+                }
+            }
+        });
+    }
+
+    public void makeMeRequest() {
+        if (ParseFacebookUtils.getSession().isOpened()) {
+            Request.newMeRequest(ParseFacebookUtils.getSession(), new Request.GraphUserCallback() {
+
+                @Override
+                public void onCompleted(GraphUser user, Response response) {
+                    if (user != null) {
+                        Log.d("guitarfb", user.getProperty("email").toString());
+                        ParseUser.getCurrentUser().put("email", user.getProperty("email").toString());
+                        ParseUser.getCurrentUser().saveInBackground();
+
+                        Intent serverIntent = new Intent(getApplicationContext(), ServerAccess.class);
+                        serverIntent.putExtra("server_action", ServerAccess.ServerAction.ADD_USER.toString());
+                        serverIntent.putExtra("email", user.getProperty("email").toString());
+                        serverIntent.putExtra("fname", user.getFirstName());
+                        serverIntent.putExtra("lname", user.getLastName());
+                        getApplicationContext().startService(serverIntent);
+
+                        sharedPrefEditor = sharedPref.edit();
+                        sharedPrefEditor.putString("user_email", user.getProperty("email").toString());
+                        sharedPrefEditor.putString("fb_id", user.getId());
+                        sharedPrefEditor.commit();
+                        fetchName(user.getProperty("email").toString());
+                        startActivity(toMainActivity);
+                        finish();
+                    }
+                }
+            }).executeAsync();
+        }
+    }
+
 
     private void fetchName(String email){
         ServerAccess serverAccess = new ServerAccess();

@@ -8,7 +8,10 @@ import android.app.FragmentManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.wifi.WifiConfiguration;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -21,9 +24,13 @@ import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -43,6 +50,8 @@ import java.util.TreeMap;
 public class CircularRevealingFragment extends Fragment{
     int cx, cy;
     WifiChangeReceiver wifiChecker;
+    SharedPreferences sharedPreferences;
+    ImageView profilePic;
 
     public CircularRevealingFragment(){
 
@@ -90,13 +99,15 @@ public class CircularRevealingFragment extends Fragment{
             }
         });
 
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getContext());
-
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getContext());
         Button setWifiButton = (Button)rootView.findViewById(R.id.wifiButton);
         setWifiButton.setText(sharedPreferences.getString("home_wifi", "No Wifi set"));
 
         TextView nameText = (TextView)rootView.findViewById(R.id.settingsName);
         nameText.setText(sharedPreferences.getString("user_fname", "") + " " +sharedPreferences.getString("user_lname", ""));
+
+        profilePic = (ImageView)rootView.findViewById(R.id.profilePic);
+        getFacebookProfilePicture();
 
         final Switch invisibleSwitch = (Switch)rootView.findViewById(R.id.invisibleSwitch);
         //check for previously set value of invisibility.
@@ -112,6 +123,36 @@ public class CircularRevealingFragment extends Fragment{
         });
 
         return rootView;
+    }
+
+
+    public Bitmap getFacebookProfilePicture(){
+        final String fb_id = sharedPreferences.getString("fb_id", null);
+        Log.d("guitar", "fb_id" + sharedPreferences.getString("fb_id", null));
+
+        AsyncTask<Void, Void, Bitmap> taskGetPicture = new AsyncTask<Void, Void, Bitmap>(){
+            protected Bitmap doInBackground(Void... p) {
+                try {
+                    URL imageURL = new URL("https://graph.facebook.com/" + fb_id + "/picture?type=large");
+                    Bitmap bitmap = BitmapFactory.decodeStream(imageURL.openConnection().getInputStream());
+                    Log.d("guitarfb", "got the image");
+                    return bitmap;
+                }catch (MalformedURLException e){
+                    Log.d("guitar", "malformed fb profile pic get error: " + e.getMessage());
+                }catch (IOException e){
+                    Log.d("guitar", "IOEx on fb profile pic: " + e.getMessage());
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Bitmap bitmap) {
+                super.onPostExecute(bitmap);
+                profilePic.setImageBitmap(bitmap);
+            }
+        };
+        taskGetPicture.execute();
+        return null;
     }
 
 

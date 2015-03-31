@@ -12,9 +12,11 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.facebook.Session;
 import com.parse.ParseAnalytics;
 import com.parse.ParseUser;
 
@@ -26,6 +28,7 @@ import mbanje.kurt.fabbutton.FabButton;
 public class MainActivity extends Activity {
 
     private TextView mainText;
+    private ImageView profilePic;
     private CircularRevealingFragment circularFragment;
     private float x,y;
     private Boolean fragUp = false;
@@ -45,7 +48,6 @@ public class MainActivity extends Activity {
 
         wifiChecker = new WifiChangeReceiver();
         ImageButton button1;
-
         button1 = (ImageButton)findViewById(R.id.addButton1);
         indeterminate = (FabButton) findViewById(R.id.indeterminate);
         mainText = (TextView)findViewById(R.id.mainText);
@@ -72,6 +74,8 @@ public class MainActivity extends Activity {
         serverBroadcastFilter.addCategory(Intent.CATEGORY_DEFAULT);
         serverBroadcastReceiver = new ServerBroadcastReceiver();
         LocalBroadcastManager.getInstance(this).registerReceiver(serverBroadcastReceiver, serverBroadcastFilter);
+
+
     }
 
     @Override
@@ -153,6 +157,12 @@ public class MainActivity extends Activity {
      */
     public void logout(View v){
         ParseUser.logOut();
+        com.facebook.Session fbs = com.facebook.Session.getActiveSession();
+        if (fbs == null) {
+            fbs = new Session(this);
+            com.facebook.Session.setActiveSession(fbs);
+        }
+        fbs.closeAndClearTokenInformation();
         sharedPreferences.edit().clear().commit();
         Intent toLoginActivity = new Intent(this, LoginActivity.class);
         startActivity(toLoginActivity);
