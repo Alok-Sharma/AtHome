@@ -1,8 +1,8 @@
 package aloksharma.ufl.edu.athome;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -22,7 +22,7 @@ import com.parse.SignUpCallback;
  * Register a new user to the app.
  */
 
-public class Registration extends ActionBarActivity {
+public class Registration extends Activity {
     protected EditText username;
     protected EditText password;
     protected EditText email;
