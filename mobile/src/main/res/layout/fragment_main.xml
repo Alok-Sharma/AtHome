@@ -88,7 +88,8 @@
             android:textSize="20dp"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
-            android:layout_centerVertical="true"/>
+            android:layout_centerVertical="true"
+            android:textColor="@color/black"/>
 
         <TextView
             android:layout_width="wrap_content"
@@ -96,7 +97,8 @@
             android:id="@+id/currentWifi"
             android:textSize="20dp"
             android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"/>
+            android:layout_alignParentEnd="true"
+            android:textColor="@color/black"/>
 
     </RelativeLayout>
 
@@ -115,7 +117,8 @@
             android:textSize="20dp"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
-            android:layout_centerVertical="true"/>
+            android:layout_centerVertical="true"
+            android:textColor="@color/black"/>
 
         <Switch
             android:layout_width="wrap_content"

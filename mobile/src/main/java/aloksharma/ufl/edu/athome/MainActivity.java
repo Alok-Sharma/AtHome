@@ -1,8 +1,12 @@
 package aloksharma.ufl.edu.athome;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.DialogFragment;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -95,6 +99,9 @@ public class MainActivity extends Activity {
         if(sharedPreferences.getBoolean("invisible", false)){
             mainText.setText("Yay!\nyou're invisible!");
             mainContainer.setBackgroundColor(getResources().getColor(R.color.bg_main_invisible));
+            TextView tv = new TextView(this);
+            tv.setText("They can't see you, you can't see them.");
+            atHomeUsersLayout.addView(tv);
         }else{
             mainContainer.setBackgroundColor(getResources().getColor(R.color.bg_main_normal));
             int numAtHome = friendsHome.size();
@@ -150,17 +157,11 @@ public class MainActivity extends Activity {
     Called by the Wifi button in the fragment_main.xml
      */
     public void setWifi(View v){
-        if(wifiChecker.getWifiID(this) != null){
-            requestToServer(ServerAccess.ServerAction.SET_WIFI); //ALOKIMP
-            wifiChecker.checkWifiHome(this);
-            requestToServer(ServerAccess.ServerAction.GET_FRIENDS_HOME);
-            String wifi_name = wifiChecker.getWifiName(this);
-            TextView currentWifiText = (TextView)findViewById(R.id.currentWifi);
-            currentWifiText.setText(wifi_name);
-            sharedPreferences.edit().putString("home_wifi_name", wifi_name).commit();
-            Toast.makeText(this, "Changed your home wifi to " + wifi_name, Toast.LENGTH_SHORT).show();
-        }
-        else{
+
+        ChangeWifiDialogFragment changeWifiDialogFragment = new ChangeWifiDialogFragment();
+        if(wifiChecker.getWifiID(this) != null) {
+            changeWifiDialogFragment.show(getFragmentManager(), "guitar");
+        }else{
             Toast.makeText(this, "Not connected to a WiFi.", Toast.LENGTH_SHORT).show();
         }
     }
@@ -202,6 +203,48 @@ public class MainActivity extends Activity {
                 changeText(friendsHome);
                 indeterminate.showProgress(false);
             }
+        }
+    }
+
+    private class ChangeWifiDialogFragment extends DialogFragment {
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            // Use the Builder class for convenient dialog construction
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            String old_wifi = sharedPreferences.getString("home_wifi_name", null);
+            final String new_wifi = wifiChecker.getWifiName(getActivity());
+            String dialog_message;
+            String dialog_cancel;
+
+            if(old_wifi.equals(new_wifi)){
+                dialog_message = "Your home wifi is already set to " + old_wifi;
+                dialog_cancel = "Ok";
+            }else{
+                dialog_message = "Change your home wifi from " + old_wifi + " to " + new_wifi + "?";
+                dialog_cancel = "Cancel";
+
+                builder.setPositiveButton("Change", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        requestToServer(ServerAccess.ServerAction.SET_WIFI); //ALOKIMP
+                        wifiChecker.checkWifiHome(getActivity());
+                        requestToServer(ServerAccess.ServerAction.GET_FRIENDS_HOME);
+
+                        TextView currentWifiText = (TextView)findViewById(R.id.currentWifi);
+                        currentWifiText.setText(new_wifi);
+                        sharedPreferences.edit().putString("home_wifi_name", new_wifi).commit();
+                        Toast.makeText(getActivity(), "Changed your home wifi to " + new_wifi, Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+
+            builder.setMessage(dialog_message);
+            builder.setNegativeButton(dialog_cancel, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    // User cancelled the dialog
+                }
+            });
+            // Create the AlertDialog object and return it
+            return builder.create();
         }
     }
 }

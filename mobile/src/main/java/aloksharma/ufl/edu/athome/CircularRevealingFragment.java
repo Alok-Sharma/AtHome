@@ -90,6 +90,7 @@ public class CircularRevealingFragment extends Fragment{
             }
         });
 
+        wifiChecker = new WifiChangeReceiver();
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getContext());
         TextView currentWifiText = (TextView)rootView.findViewById(R.id.currentWifi);
         currentWifiText.setText(sharedPreferences.getString("home_wifi_name", "No Wifi set"));
@@ -115,7 +116,7 @@ public class CircularRevealingFragment extends Fragment{
                 }else{
                     Log.d("guitar", "ischecked false");
                     sharedPreferences.edit().putBoolean("invisible", false).commit();
-                    requestToServer(ServerAccess.ServerAction.SET_HOME_STATUS);
+                    wifiChecker.checkWifiHome(getActivity());
                     requestToServer(ServerAccess.ServerAction.GET_FRIENDS_HOME);
                 }
             }
