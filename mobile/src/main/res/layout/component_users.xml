@@ -18,6 +18,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="HomeUser"
+        android:textColor="@color/text"
         android:id="@+id/atHomeUserText"
         android:layout_below="@+id/atHomeUserImage"
         android:layout_centerHorizontal="true"

@@ -8,7 +8,7 @@
     android:orientation="vertical"
     tools:context=".MainActivity"
     tools:ignore="MergeRootFrame"
-    android:background="#ff0099cc"
+    android:background="@color/bg_main_normal"
     >
 
     <ImageButton
@@ -58,10 +58,11 @@
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:text="Looking for\nwho is home.."
-            android:textSize="48dp"
+            android:textSize="68dp"
             android:id="@+id/mainText"
             android:textStyle="bold"
             android:gravity="center"
+            android:textColor="@color/text"
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="150dp" />

@@ -55,9 +55,6 @@ public class LoginActivity extends Activity {
             finish();
         }
 
-        View someView = findViewById(R.id.login);
-        View root = someView.getRootView();
-        root.setBackgroundColor(getResources().getColor(android.R.color.holo_blue_dark));
         username=(EditText)findViewById(R.id.username);
         password=(EditText)findViewById(R.id.password);
         signIn=(Button)findViewById(R.id.signIn);

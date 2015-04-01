@@ -12,6 +12,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v7.widget.SwitchCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,7 +22,6 @@ import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
-import android.widget.Switch;
 import android.widget.TextView;
 
 import java.io.IOException;
@@ -48,12 +48,11 @@ public class CircularRevealingFragment extends Fragment{
 
     }
 
-    public static CircularRevealingFragment newInstance(int centerX, int centerY, int color)
+    public static CircularRevealingFragment newInstance(int centerX, int centerY)
     {
         Bundle args = new Bundle();
         args.putInt("cx", centerX);
         args.putInt("cy", centerY);
-        args.putInt("color", color);
         CircularRevealingFragment fragment = new CircularRevealingFragment();
         fragment.setArguments(args);
         return fragment;
@@ -64,7 +63,6 @@ public class CircularRevealingFragment extends Fragment{
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-        rootView.setBackgroundColor(getArguments().getInt("color"));
         // To run the animation as soon as the view is layout in the view hierarchy we add this
         // listener and removeFragment it
         // as soon as it runs to prevent multiple animations if the view changes bounds
@@ -102,7 +100,7 @@ public class CircularRevealingFragment extends Fragment{
         getFacebookProfilePicture();
 
         serverIntent = new Intent(getActivity(), ServerAccess.class);
-        Switch invisibleSwitch = (Switch)rootView.findViewById(R.id.invisibleSwitch);
+        SwitchCompat invisibleSwitch = (SwitchCompat)rootView.findViewById(R.id.invisibleSwitch);
         invisibleSwitch.setChecked(sharedPreferences.getBoolean("invisible", false));
         //check for previously set value of invisibility.
         invisibleSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {

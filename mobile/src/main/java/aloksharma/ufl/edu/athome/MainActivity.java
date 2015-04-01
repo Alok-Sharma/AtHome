@@ -107,13 +107,13 @@ public class MainActivity extends Activity {
             int numAtHome = friendsHome.size();
 
             if(sharedPreferences.getString("home_wifi_id", null) == null){
-                mainText.setText("Pssst,\ntell me your\nhome wifi\nin the settings.");
+                mainText.setText("Pssst,\ntell me your\nhome wifi\nin the settings");
             }else if(numAtHome == 0){
-                mainText.setText("Nope,\nno one\nis home.");
+                mainText.setText("Nope,\nno one\nis home");
             }else if (numAtHome == 1){
-                mainText.setText("Yep,\n1 person\nis home.");
+                mainText.setText("Yep,\n1 person\nis home");
             }else{
-                mainText.setText("Yep,\n" + numAtHome + " people\n are home.");
+                mainText.setText("Yep,\n" + numAtHome + " people\n are home");
             }
 
             for(int i = 0; i < numAtHome; i++){
@@ -131,8 +131,7 @@ public class MainActivity extends Activity {
     public void addFragment(final View v)
     {
         fragUp = true;
-        int fragmentColor = 0xFFC33C54;
-        circularFragment = CircularRevealingFragment.newInstance((int) x, (int) y, fragmentColor);
+        circularFragment = CircularRevealingFragment.newInstance((int) x, (int) y);
         getFragmentManager().beginTransaction().add(android.R.id.content, circularFragment).addToBackStack(null).commit();
     }
 

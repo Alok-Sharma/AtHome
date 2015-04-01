@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <color name="bg_settings">#C33C54</color>
-    <color name="bg_settings_profile">#932D40</color>
+    <color name="bg_settings">#F7475F</color>
+    <color name="bg_settings_profile">#D13C50</color>
+    <color name="bg_main_invisible">#6D6870</color>
+    <color name="bg_main_normal">#A8F0B8</color>
+    <color name="bg_login">#D4D980</color>
+    <color name="text">#000</color>
     <color name="white">#FFFFFF</color>
     <color name="black">#000</color>
-    <color name="bg_main_invisible">#6D6870</color>
-    <color name="bg_main_normal">#ff0099cc</color>
 
 </resources>
