@@ -43,42 +43,34 @@ public class ServerAccess extends IntentService {
         List<ParseObject> friends;
         List<AtHomeUser> friendsHome = new ArrayList<>();
 
-        List<String> friendList = userObject.getList("FriendList");
-        friendList.add(userObject.getString("Email")); //tell server to fetch my details, in addition to fetching details of friends.
+        ParseQuery<ParseObject> friendQuery = new ParseQuery<>("AtHome");
+        String wifi_id = sharedPreferences.getString("home_wifi_id", null);
+        Log.d("guitar", "looking for wifi: " + wifi_id);
+        friendQuery.whereEqualTo("wifi", wifi_id);
 
-        if(friendList.size() != 0) {
+        try{
+            friends = friendQuery.find();
+            Log.d("guitar", "fetched " + friends.size() + " friends");
+            for (int j = 0; j < friends.size(); j++) {
+                Log.d("guitar", friends.get(j).getString("Email") + " is " + friends.get(j).get("Status"));
+                friends.get(j).pin(); //update their pin whenever you fetch them.
 
-            ParseQuery<ParseObject> friendQuery = new ParseQuery<>("AtHome");
-            String wifi_id = sharedPreferences.getString("home_wifi_id", null);
-            Log.d("guitar", "looking for wifi: " + wifi_id);
-            friendQuery.whereEqualTo("wifi", wifi_id);
-
-            try{
-                friends = friendQuery.find();
-                Log.d("guitar", "fetched " + friends.size() + " friends");
-                for (int j = 0; j < friends.size(); j++) {
-                    Log.d("guitar", friends.get(j).getString("Email") + " is " + friends.get(j).get("Status"));
-                    friends.get(j).pin(); //update their pin whenever you fetch them.
-
-                    if(friends.get(j).getString("Email").equals(userObject.getString("Email"))){
-                        //if found myself in list, update myself in local datastore.
-                        friends.get(j).pin();
-                    }else if(friends.get(j).getBoolean("Status")){
-                        AtHomeUser atHomeUser = new AtHomeUser();
-                        atHomeUser.setEmail(friends.get(j).getString("Email"));
-                        atHomeUser.setFirstName(friends.get(j).getString("First_Name"));
-                        atHomeUser.setLastName(friends.get(j).getString("Last_Name"));
-                        atHomeUser.setWifi(friends.get(j).getString("wifi"));
-                        friendsHome.add(atHomeUser);
-                    }else{
-                        //If friend not home, do nothing.
-                    }
+                if(friends.get(j).getString("Email").equals(userObject.getString("Email"))){
+                    //if found myself in list, update myself in local datastore.
+                    friends.get(j).pin();
+                }else if(friends.get(j).getBoolean("Status")){
+                    AtHomeUser atHomeUser = new AtHomeUser();
+                    atHomeUser.setEmail(friends.get(j).getString("Email"));
+                    atHomeUser.setFirstName(friends.get(j).getString("First_Name"));
+                    atHomeUser.setLastName(friends.get(j).getString("Last_Name"));
+                    atHomeUser.setWifi(friends.get(j).getString("wifi"));
+                    friendsHome.add(atHomeUser);
+                }else{
+                    //If friend not home, do nothing.
                 }
-            }catch (ParseException e){
-                Log.d("guitar", "error finding friends: " + e.getMessage());
             }
-        }else{
-            Log.d("guitar", "getFriendsHome got an empty list of friends, meaning friends dont exist yet.");
+        }catch (ParseException e){
+            Log.d("guitar", "error finding friends: " + e.getMessage());
         }
         return friendsHome;
     }
@@ -163,13 +155,23 @@ public class ServerAccess extends IntentService {
     }
 
 
-    public void setAtHomeStatus(final ParseObject userObject, final Boolean status){
+    public void setAtHomeStatus(ParseObject userObject, Boolean status){
         //first check what we have already told the server from the existing user object. If different, then tell server.
-        Boolean statusOnServer = userObject.getBoolean("Status");
+        Boolean statusOnServer = (Boolean)userObject.get("Status");
         Log.d("guitar", "changing status to " + status + ". User object says: " + statusOnServer);
         if(statusOnServer != status){
             //send to server now.
-            userObject.put("Status", status);
+            if(status == null){
+                //status = null means invisibility has been set.
+                userObject.remove("Status");
+                Log.d("guitar", "changed to invisible on server.");
+            }else if(!sharedPreferences.getBoolean("invisible", false)){
+                userObject.put("Status", status);
+                Log.d("guitar", "changed to " + status + " on server.");
+            }else{
+                Log.d("guitar", "status was not null, but invisible was true, so doing nothing.");
+            }
+
             try{
                 userObject.save();
                 userObject.pin();
@@ -229,8 +231,8 @@ public class ServerAccess extends IntentService {
             Log.d("guitarintent", "set home status intent: " + intent.getBooleanExtra("server_action_arg", false));
             setAtHomeStatus(getUser(userEmail), intent.getBooleanExtra("server_action_arg", false));
         }else if(action.equals(ServerAction.SET_INVISIBLE.toString())){
-            Log.d("guitarintent", "set invisible: ");
-            //TODO: invisible
+            Log.d("guitarintent", "set invisible");
+            setAtHomeStatus(getUser(userEmail), null);
         }else if(action.equals(ServerAction.GET_USER.toString())){
             Log.d("guitarintent", "get user intent");
             ParseObject userObject = getUser(userEmail);

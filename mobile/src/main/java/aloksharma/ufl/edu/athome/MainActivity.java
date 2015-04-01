@@ -9,15 +9,19 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.facebook.Session;
 import com.parse.ParseAnalytics;
+import com.parse.ParseException;
+import com.parse.ParseObject;
 import com.parse.ParseUser;
 
 import java.util.ArrayList;
@@ -74,7 +78,6 @@ public class MainActivity extends Activity {
         serverBroadcastReceiver = new ServerBroadcastReceiver();
         LocalBroadcastManager.getInstance(this).registerReceiver(serverBroadcastReceiver, serverBroadcastFilter);
 
-
     }
 
     @Override
@@ -87,28 +90,31 @@ public class MainActivity extends Activity {
 
     public void changeText(ArrayList<AtHomeUser> friendsHome){
         atHomeUsersLayout.removeAllViews();
-        int numAtHome = friendsHome.size();
+        RelativeLayout mainContainer = (RelativeLayout)findViewById(R.id.mainContainer);
 
-        if(sharedPreferences.getString("home_wifi_id", null) == null){
-            mainText.setText("Pssst,\ntell me your\nhome wifi\nin the settings.");
-        }else if(numAtHome == 0){
-            mainText.setText("Nope,\nno one\nis home.");
-        }else if (numAtHome == 1){
-            mainText.setText("Yep,\n1 person\nis home.");
+        if(sharedPreferences.getBoolean("invisible", false)){
+            mainText.setText("Yay!\nyou're invisible!");
+            mainContainer.setBackgroundColor(getResources().getColor(R.color.bg_main_invisible));
         }else{
-            mainText.setText("Yep,\n" + numAtHome + " people\n are home.");
-        }
+            mainContainer.setBackgroundColor(getResources().getColor(R.color.bg_main_normal));
+            int numAtHome = friendsHome.size();
 
-        for(int i = 0; i < numAtHome; i++){
-//            TextView tv = new TextView(this);
-            View homeUserView = getLayoutInflater().inflate(R.layout.component_users, atHomeUsersLayout, false);
-//            tv.setGravity(Gravity.CENTER);
-//            tv.setPadding(5,0,5,0);
-//            tv.setText(friendsHome.get(i).getFirstName());
-//            atHomeUsersLayout.addView(tv);
-            atHomeUsersLayout.addView(homeUserView);
-            TextView homeUserName = (TextView)homeUserView.findViewById(R.id.atHomeUserText);
-            homeUserName.setText(friendsHome.get(i).getFirstName());
+            if(sharedPreferences.getString("home_wifi_id", null) == null){
+                mainText.setText("Pssst,\ntell me your\nhome wifi\nin the settings.");
+            }else if(numAtHome == 0){
+                mainText.setText("Nope,\nno one\nis home.");
+            }else if (numAtHome == 1){
+                mainText.setText("Yep,\n1 person\nis home.");
+            }else{
+                mainText.setText("Yep,\n" + numAtHome + " people\n are home.");
+            }
+
+            for(int i = 0; i < numAtHome; i++){
+                View homeUserView = getLayoutInflater().inflate(R.layout.component_users, atHomeUsersLayout, false);
+                atHomeUsersLayout.addView(homeUserView);
+                TextView homeUserName = (TextView)homeUserView.findViewById(R.id.atHomeUserText);
+                homeUserName.setText(friendsHome.get(i).getFirstName());
+            }
         }
     }
 
@@ -164,6 +170,11 @@ public class MainActivity extends Activity {
      */
     public void logout(View v){
         ParseUser.logOut();
+        try{
+            ParseObject.unpinAll();
+        }catch (ParseException e){
+            Log.d("guitarError", "unable to unpin all in logout method: " + e.getMessage());
+        }
         com.facebook.Session fbs = com.facebook.Session.getActiveSession();
         if (fbs == null) {
             fbs = new Session(this);

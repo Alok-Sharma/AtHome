@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -41,6 +42,7 @@ public class CircularRevealingFragment extends Fragment{
     WifiChangeReceiver wifiChecker;
     SharedPreferences sharedPreferences;
     ImageView profilePic;
+    Intent serverIntent;
 
     public CircularRevealingFragment(){
 
@@ -98,21 +100,33 @@ public class CircularRevealingFragment extends Fragment{
         profilePic = (ImageView)rootView.findViewById(R.id.profilePic);
         getFacebookProfilePicture();
 
-
-        final Switch invisibleSwitch = (Switch)rootView.findViewById(R.id.invisibleSwitch);
+        serverIntent = new Intent(getActivity(), ServerAccess.class);
+        Switch invisibleSwitch = (Switch)rootView.findViewById(R.id.invisibleSwitch);
+        invisibleSwitch.setChecked(sharedPreferences.getBoolean("invisible", false));
         //check for previously set value of invisibility.
         invisibleSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if(isChecked){
                     Log.d("guitar", "ischecked true");
+                    sharedPreferences.edit().putBoolean("invisible", true).commit();
+                    requestToServer(ServerAccess.ServerAction.SET_INVISIBLE);
+                    requestToServer(ServerAccess.ServerAction.GET_FRIENDS_HOME);
                 }else{
                     Log.d("guitar", "ischecked false");
+                    sharedPreferences.edit().putBoolean("invisible", false).commit();
+                    requestToServer(ServerAccess.ServerAction.SET_HOME_STATUS);
+                    requestToServer(ServerAccess.ServerAction.GET_FRIENDS_HOME);
                 }
             }
         });
 
         return rootView;
+    }
+
+    private void requestToServer(ServerAccess.ServerAction serverAction){
+        serverIntent.putExtra("server_action", serverAction.toString());
+        getActivity().startService(serverIntent);
     }
 
 

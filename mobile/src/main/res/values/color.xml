@@ -4,7 +4,7 @@
     <color name="bg_settings">#C33C54</color>
     <color name="bg_settings_profile">#932D40</color>
     <color name="white">#FFFFFF</color>
-    <color name="bg_main">#2B8449</color>
-    3A4F41
+    <color name="bg_main_invisible">#6D6870</color>
+    <color name="bg_main_normal">#ff0099cc</color>
 
 </resources>

@@ -1,5 +1,5 @@
 <RelativeLayout
-    android:id="@+id/container"
+    android:id="@+id/mainContainer"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
