@@ -55,6 +55,10 @@ public class ServerAccess extends IntentService {
                 Log.d("guitar", friends.get(j).getString("Email") + " is " + friends.get(j).get("Status"));
                 friends.get(j).pin(); //update their pin whenever you fetch them.
 
+                if(friends.size() == 1){
+                    //Current user is the only one on this Wifi.
+                    return null;
+                }
                 if(friends.get(j).getString("Email").equals(userObject.getString("Email"))){
                     //if found myself in list, update myself in local datastore.
                     friends.get(j).pin();
@@ -226,7 +230,12 @@ public class ServerAccess extends IntentService {
         }else if(action.equals(ServerAction.GET_FRIENDS_HOME.toString())){
             List<AtHomeUser> friendsHome = getFriendsHome(getUser(userEmail));
             Log.d("guitarintent", "get friends home: " + friendsHome);
-            responseIntent.putParcelableArrayListExtra("data", new ArrayList<AtHomeUser>(friendsHome));
+            if(friendsHome == null){
+                //Current user is the only one on this wifi
+                responseIntent.putParcelableArrayListExtra("data", null);
+            }else{
+                responseIntent.putParcelableArrayListExtra("data", new ArrayList<>(friendsHome));
+            }
         }else if(action.equals(ServerAction.SET_HOME_STATUS.toString())){
             Log.d("guitarintent", "set home status intent: " + intent.getBooleanExtra("server_action_arg", false));
             setAtHomeStatus(getUser(userEmail), intent.getBooleanExtra("server_action_arg", false));

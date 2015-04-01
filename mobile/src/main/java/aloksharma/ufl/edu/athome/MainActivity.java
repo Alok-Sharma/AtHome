@@ -104,23 +104,30 @@ public class MainActivity extends Activity {
             atHomeUsersLayout.addView(tv);
         }else{
             mainContainer.setBackgroundColor(getResources().getColor(R.color.bg_main_normal));
-            int numAtHome = friendsHome.size();
-
             if(sharedPreferences.getString("home_wifi_id", null) == null){
                 mainText.setText("Pssst,\ntell me your\nhome wifi\nin the settings");
-            }else if(numAtHome == 0){
+            }else if(friendsHome == null){
+                //Current user is the only one on this wifi.
+                mainText.setText("Oh,\n you're 1st\non this wifi");
+                mainContainer.setBackgroundColor(getResources().getColor(R.color.bg_main_invisible));
+                TextView tv = new TextView(this);
+                tv.setText("Tell them about this app! You're the only one for now.");
+                atHomeUsersLayout.addView(tv);
+            }else if(friendsHome.size() == 0){
                 mainText.setText("Nope,\nno one\nis home");
-            }else if (numAtHome == 1){
+            }else if (friendsHome.size() == 1){
                 mainText.setText("Yep,\n1 person\nis home");
             }else{
-                mainText.setText("Yep,\n" + numAtHome + " people\n are home");
+                mainText.setText("Yep,\n" + friendsHome.size() + " people\n are home");
             }
 
-            for(int i = 0; i < numAtHome; i++){
-                View homeUserView = getLayoutInflater().inflate(R.layout.component_users, atHomeUsersLayout, false);
-                atHomeUsersLayout.addView(homeUserView);
-                TextView homeUserName = (TextView)homeUserView.findViewById(R.id.atHomeUserText);
-                homeUserName.setText(friendsHome.get(i).getFirstName());
+            if(friendsHome != null) {
+                for (int i = 0; i < friendsHome.size(); i++) {
+                    View homeUserView = getLayoutInflater().inflate(R.layout.component_users, atHomeUsersLayout, false);
+                    atHomeUsersLayout.addView(homeUserView);
+                    TextView homeUserName = (TextView) homeUserView.findViewById(R.id.atHomeUserText);
+                    homeUserName.setText(friendsHome.get(i).getFirstName());
+                }
             }
         }
     }
