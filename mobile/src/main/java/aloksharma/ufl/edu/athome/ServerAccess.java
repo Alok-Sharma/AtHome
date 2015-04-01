@@ -125,6 +125,13 @@ public class ServerAccess extends IntentService {
             userObject = userObjects.get(0);
         }
         Log.d("guitarUser", "I am: " + userObject.getString("First_Name"));
+        SharedPreferences.Editor sharedPrefEditor = sharedPreferences.edit();
+        sharedPrefEditor.putString("user_fname", userObject.getString("First_Name"));
+        sharedPrefEditor.putString("user_lname", userObject.getString("Last_Name"));
+        sharedPrefEditor.putString("home_wifi_id", userObject.getString("wifi"));
+        sharedPrefEditor.putString("home_wifi_name", userObject.getString("wifi_name"));
+        sharedPrefEditor.commit();
+
         return userObject;
     }
 
@@ -146,7 +153,7 @@ public class ServerAccess extends IntentService {
                 newUser.put("FriendList", friendList);
                 newUser.put("First_Name", first_name);
                 newUser.put("Last_Name", last_name);
-                newUser.pinInBackground(); //save this offline in the datastore, and then save in cloud.
+                newUser.pin(); //save this offline in the datastore, and then save in cloud.
                 newUser.save();
             }else{
                 //Email already exists on server. Do not push.

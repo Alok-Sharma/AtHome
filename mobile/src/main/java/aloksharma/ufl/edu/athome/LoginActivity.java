@@ -19,7 +19,6 @@ import com.facebook.model.GraphUser;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseFacebookUtils;
-import com.parse.ParseObject;
 import com.parse.ParseUser;
 
 import java.util.Arrays;
@@ -50,7 +49,7 @@ public class LoginActivity extends Activity {
             sharedPrefEditor = sharedPref.edit();
             sharedPrefEditor.putString("user_email", ParseUser.getCurrentUser().getEmail());
             sharedPrefEditor.commit();
-            fetchName(ParseUser.getCurrentUser().getEmail());
+            fetchName();
             startActivity(toMainActivity);
             finish();
         }
@@ -72,7 +71,7 @@ public class LoginActivity extends Activity {
                             sharedPrefEditor = sharedPref.edit();
                             sharedPrefEditor.putString("user_email", ParseUser.getCurrentUser().getEmail());
                             sharedPrefEditor.commit();
-                            fetchName(ParseUser.getCurrentUser().getEmail());
+                            fetchName();
                             startActivity(toMainActivity);
                             finish();
                         } else {
@@ -122,6 +121,7 @@ public class LoginActivity extends Activity {
                         Log.d("guitarfb", user.getProperty("email").toString());
                         ParseUser.getCurrentUser().put("email", user.getProperty("email").toString());
                         ParseUser.getCurrentUser().saveInBackground();
+                        ParseUser.getCurrentUser().pinInBackground();
 
                         Intent serverIntent = new Intent(getApplicationContext(), ServerAccess.class);
                         serverIntent.putExtra("server_action", ServerAccess.ServerAction.ADD_USER.toString());
@@ -134,7 +134,7 @@ public class LoginActivity extends Activity {
                         sharedPrefEditor.putString("user_email", user.getProperty("email").toString());
                         sharedPrefEditor.putString("fb_id", user.getId());
                         sharedPrefEditor.commit();
-                        fetchName(user.getProperty("email").toString());
+                        fetchName();
                         startActivity(toMainActivity);
                         finish();
                     }
@@ -144,14 +144,10 @@ public class LoginActivity extends Activity {
     }
 
 
-    private void fetchName(String email){
-        ServerAccess serverAccess = new ServerAccess();
-        ParseObject userObject = serverAccess.getUser(email);
-        sharedPrefEditor.putString("user_fname", userObject.getString("First_Name"));
-        sharedPrefEditor.putString("user_lname", userObject.getString("Last_Name"));
-        sharedPrefEditor.putString("home_wifi_id", userObject.getString("wifi"));
-        sharedPrefEditor.putString("home_wifi_name", userObject.getString("wifi_name"));
-        sharedPrefEditor.commit();
+    private void fetchName(){
+        Intent serverIntent = new Intent(getApplicationContext(), ServerAccess.class);
+        serverIntent.putExtra("server_action", ServerAccess.ServerAction.GET_USER.toString());
+        getApplicationContext().startService(serverIntent);
     }
 
     @Override

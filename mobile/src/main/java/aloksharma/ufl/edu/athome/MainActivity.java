@@ -111,7 +111,7 @@ public class MainActivity extends Activity {
                 mainText.setText("Oh,\n you're 1st\non this wifi");
                 mainContainer.setBackgroundColor(getResources().getColor(R.color.bg_main_invisible));
                 TextView tv = new TextView(this);
-                tv.setText("Tell them about this app! You're the only one for now.");
+                tv.setText("Tell others about this app! You're alone here for now.");
                 atHomeUsersLayout.addView(tv);
             }else if(friendsHome.size() == 0){
                 mainText.setText("Nope,\nno one\nis home");
@@ -222,7 +222,23 @@ public class MainActivity extends Activity {
             String dialog_message;
             String dialog_cancel;
 
-            if(old_wifi.equals(new_wifi)){
+            if(old_wifi == null){
+                dialog_message = "Set " + new_wifi + " as your home Wifi?";
+                dialog_cancel = "Cancel";
+                //TODO: Important- Using same code here and in the else method. Need to restructure the if clauses.
+                builder.setPositiveButton("Change", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        requestToServer(ServerAccess.ServerAction.SET_WIFI); //ALOKIMP
+                        wifiChecker.checkWifiHome(getActivity());
+                        requestToServer(ServerAccess.ServerAction.GET_FRIENDS_HOME);
+
+                        TextView currentWifiText = (TextView)findViewById(R.id.currentWifi);
+                        currentWifiText.setText(new_wifi);
+                        sharedPreferences.edit().putString("home_wifi_name", new_wifi).commit();
+                        Toast.makeText(getActivity(), "Changed your home wifi to " + new_wifi, Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }else if(old_wifi.equals(new_wifi)){
                 dialog_message = "Your home wifi is already set to " + old_wifi;
                 dialog_cancel = "Ok";
             }else{

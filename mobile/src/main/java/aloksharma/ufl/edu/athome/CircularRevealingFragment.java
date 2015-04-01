@@ -115,6 +115,7 @@ public class CircularRevealingFragment extends Fragment{
                     Log.d("guitar", "ischecked false");
                     sharedPreferences.edit().putBoolean("invisible", false).commit();
                     wifiChecker.checkWifiHome(getActivity());
+                    requestToServer(ServerAccess.ServerAction.SET_HOME_STATUS);
                     requestToServer(ServerAccess.ServerAction.GET_FRIENDS_HOME);
                 }
             }
