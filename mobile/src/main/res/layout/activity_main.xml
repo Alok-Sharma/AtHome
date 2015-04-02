@@ -63,9 +63,9 @@
             android:textStyle="bold"
             android:gravity="center"
             android:textColor="@color/text"
-            android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="150dp" />
+            android:layout_centerInParent="true"
+            android:layout_centerVertical="true"/>
 
         <LinearLayout
             android:orientation="horizontal"

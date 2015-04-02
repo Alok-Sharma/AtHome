@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageButton;
@@ -99,25 +100,32 @@ public class MainActivity extends Activity {
             mainText.setText("Yay!\nyou're invisible!");
             mainContainer.setBackgroundColor(getResources().getColor(R.color.bg_main_invisible));
             TextView tv = new TextView(this);
+            tv.setGravity(Gravity.CENTER);
             tv.setText("They can't see you, you can't see them.");
             atHomeUsersLayout.addView(tv);
+
         }else{
             mainContainer.setBackgroundColor(getResources().getColor(R.color.bg_main_normal));
             if(sharedPreferences.getString("home_wifi_id", null) == null){
-                mainText.setText("Pssst,\ntell me your\nhome wifi\nin the settings");
+                mainText.setText("Pssst,\nwhat's your\nhome WiFi?");
+                TextView tv = new TextView(this);
+                tv.setGravity(Gravity.CENTER);
+                tv.setText("Set your home WiFi from the settings option above.");
+                atHomeUsersLayout.addView(tv);
             }else if(friendsHome == null){
                 //Current user is the only one on this wifi.
-                mainText.setText("Oh,\n you're 1st\non this wifi");
+                mainText.setText("You are\nthe 1st one\non this WiFi");
                 mainContainer.setBackgroundColor(getResources().getColor(R.color.bg_main_invisible));
                 TextView tv = new TextView(this);
-                tv.setText("Tell others about this app! You're alone here for now.");
+                tv.setGravity(Gravity.CENTER);
+                tv.setText("Share this app with others in your home. No one else found on this WiFi for now.");
                 atHomeUsersLayout.addView(tv);
             }else if(friendsHome.size() == 0){
                 mainText.setText("Nope,\nno one\nis home");
             }else if (friendsHome.size() == 1){
                 mainText.setText("Yep,\n1 person\nis home");
             }else{
-                mainText.setText("Yep,\n" + friendsHome.size() + " people\n are home");
+                mainText.setText("Yep,\n" + friendsHome.size() + " people\nare home");
             }
 
             if(friendsHome != null) {
