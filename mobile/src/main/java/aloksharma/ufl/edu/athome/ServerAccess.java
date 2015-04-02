@@ -26,6 +26,10 @@ public class ServerAccess extends IntentService {
         SET_WIFI
     }
 
+    public enum AtHomeStatus {
+        TRUE, FALSE, INVISIBLE
+    }
+
     String userEmail;
     SharedPreferences sharedPreferences;
 
@@ -62,7 +66,7 @@ public class ServerAccess extends IntentService {
                 if(friends.get(j).getString("Email").equals(userObject.getString("Email"))){
                     //if found myself in list, update myself in local datastore.
                     friends.get(j).pin();
-                }else if(friends.get(j).getBoolean("Status")){
+                }else if(friends.get(j).get("Status").equals(AtHomeStatus.TRUE.toString())){
                     AtHomeUser atHomeUser = new AtHomeUser();
                     atHomeUser.setEmail(friends.get(j).getString("Email"));
                     atHomeUser.setFirstName(friends.get(j).getString("First_Name"));
@@ -149,8 +153,6 @@ public class ServerAccess extends IntentService {
                 //User doesn't exist. Put new user on server
                 Log.d("guitar", "new user!");
                 newUser.put("Email", userEmail);
-                newUser.put("Status", false);
-                newUser.put("FriendList", friendList);
                 newUser.put("First_Name", first_name);
                 newUser.put("Last_Name", last_name);
                 newUser.pin(); //save this offline in the datastore, and then save in cloud.
@@ -166,15 +168,19 @@ public class ServerAccess extends IntentService {
     }
 
 
-    public void setAtHomeStatus(ParseObject userObject, Boolean status){
+    public void setAtHomeStatus(ParseObject userObject, String status){
         //first check what we have already told the server from the existing user object. If different, then tell server.
-        Boolean statusOnServer = (Boolean)userObject.get("Status");
+        String statusOnServer = userObject.getString("Status");
+        if (statusOnServer == null){
+            statusOnServer = "";
+        }
+
         Log.d("guitar", "changing status to " + status + ". User object says: " + statusOnServer);
-        if(statusOnServer != status){
+        if(!statusOnServer.equals(status)){
             //send to server now.
-            if(status == null){
+            if(status.equals(AtHomeStatus.INVISIBLE.toString())){
                 //status = null means invisibility has been set.
-                userObject.remove("Status");
+                userObject.put("Status", AtHomeStatus.INVISIBLE.toString());
                 Log.d("guitar", "changed to invisible on server.");
             }else if(!sharedPreferences.getBoolean("invisible", false)){
                 userObject.put("Status", status);
@@ -244,11 +250,11 @@ public class ServerAccess extends IntentService {
                 responseIntent.putParcelableArrayListExtra("data", new ArrayList<>(friendsHome));
             }
         }else if(action.equals(ServerAction.SET_HOME_STATUS.toString())){
-            Log.d("guitarintent", "set home status intent: " + intent.getBooleanExtra("server_action_arg", false));
-            setAtHomeStatus(getUser(userEmail), intent.getBooleanExtra("server_action_arg", false));
+            Log.d("guitarintent", "set home status intent: " + intent.getStringExtra("server_action_arg"));
+            setAtHomeStatus(getUser(userEmail), intent.getStringExtra("server_action_arg"));
         }else if(action.equals(ServerAction.SET_INVISIBLE.toString())){
             Log.d("guitarintent", "set invisible");
-            setAtHomeStatus(getUser(userEmail), null);
+            setAtHomeStatus(getUser(userEmail), AtHomeStatus.INVISIBLE.toString());
         }else if(action.equals(ServerAction.GET_USER.toString())){
             Log.d("guitarintent", "get user intent");
             ParseObject userObject = getUser(userEmail);

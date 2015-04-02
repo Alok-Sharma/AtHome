@@ -72,11 +72,10 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View v) {
                 indeterminate.showProgress(true);
-                requestToServer(ServerAccess.ServerAction.GET_FRIENDS_HOME);
+                requestToServer(getApplicationContext(), ServerAccess.ServerAction.GET_FRIENDS_HOME);
             }
         });
 
-        serverIntent = new Intent(getApplicationContext(), ServerAccess.class);
         IntentFilter serverBroadcastFilter = new IntentFilter("server_response");
         serverBroadcastFilter.addCategory(Intent.CATEGORY_DEFAULT);
         serverBroadcastReceiver = new ServerBroadcastReceiver();
@@ -88,7 +87,7 @@ public class MainActivity extends Activity {
     protected void onResume() {
         super.onResume();
         ParseAnalytics.trackAppOpenedInBackground(getIntent()); //Parse analytics for app opens
-        requestToServer(ServerAccess.ServerAction.GET_FRIENDS_HOME); //get list of friends who are home
+        requestToServer(getApplicationContext(), ServerAccess.ServerAction.GET_FRIENDS_HOME); //get list of friends who are home
         wifiChecker.checkWifiHome(this); //report to server if I am home.
     }
 
@@ -167,7 +166,6 @@ public class MainActivity extends Activity {
         ChangeWifiDialogFragment changeWifiDialogFragment = new ChangeWifiDialogFragment();
         if(wifiChecker.getWifiID(this) != null) {
             changeWifiDialogFragment.show(getFragmentManager(), "guitar");
-            requestToServer(ServerAccess.ServerAction.SET_HOME_STATUS);
         }else{
             Toast.makeText(this, "Not connected to a WiFi.", Toast.LENGTH_SHORT).show();
         }
@@ -195,9 +193,10 @@ public class MainActivity extends Activity {
         finish();
     }
 
-    private void requestToServer(ServerAccess.ServerAction serverAction){
+    private static void requestToServer(Context context, ServerAccess.ServerAction serverAction){
+        Intent serverIntent = new Intent(context, ServerAccess.class);
         serverIntent.putExtra("server_action", serverAction.toString());
-        getApplicationContext().startService(serverIntent);
+        context.startService(serverIntent);
     }
 
     private class ServerBroadcastReceiver extends BroadcastReceiver {
@@ -213,13 +212,18 @@ public class MainActivity extends Activity {
         }
     }
 
-    private class ChangeWifiDialogFragment extends DialogFragment {
+    public static class ChangeWifiDialogFragment extends DialogFragment {
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
+            final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            final WifiChangeReceiver wifiChecker = new WifiChangeReceiver();
+
             // Use the Builder class for convenient dialog construction
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
             String old_wifi = sharedPreferences.getString("home_wifi_name", null);
             final String new_wifi = wifiChecker.getWifiName(getActivity());
+            final String new_wifi_id = wifiChecker.getWifiID(getActivity());
+
             String dialog_message;
             String dialog_cancel;
 
@@ -229,14 +233,15 @@ public class MainActivity extends Activity {
                 //TODO: Important- Using same code here and in the else method. Need to restructure the if clauses.
                 builder.setPositiveButton("Change", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        requestToServer(ServerAccess.ServerAction.SET_WIFI); //ALOKIMP
-                        wifiChecker.checkWifiHome(getActivity());
-                        requestToServer(ServerAccess.ServerAction.GET_FRIENDS_HOME);
-
-                        TextView currentWifiText = (TextView)findViewById(R.id.currentWifi);
+                        TextView currentWifiText = (TextView)getActivity().findViewById(R.id.currentWifi);
                         currentWifiText.setText(new_wifi);
                         sharedPreferences.edit().putString("home_wifi_name", new_wifi).commit();
+                        sharedPreferences.edit().putString("home_wifi_id", new_wifi_id).commit();
+
                         Toast.makeText(getActivity(), "Changed your home wifi to " + new_wifi, Toast.LENGTH_SHORT).show();
+                        wifiChecker.checkWifiHome(getActivity());
+                        requestToServer(getActivity(), ServerAccess.ServerAction.SET_WIFI);
+                        requestToServer(getActivity(), ServerAccess.ServerAction.GET_FRIENDS_HOME);
                     }
                 });
             }else if(old_wifi.equals(new_wifi)){
@@ -248,14 +253,15 @@ public class MainActivity extends Activity {
 
                 builder.setPositiveButton("Change", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        requestToServer(ServerAccess.ServerAction.SET_WIFI); //ALOKIMP
-                        wifiChecker.checkWifiHome(getActivity());
-                        requestToServer(ServerAccess.ServerAction.GET_FRIENDS_HOME);
-
-                        TextView currentWifiText = (TextView)findViewById(R.id.currentWifi);
+                        TextView currentWifiText = (TextView)getActivity().findViewById(R.id.currentWifi);
                         currentWifiText.setText(new_wifi);
                         sharedPreferences.edit().putString("home_wifi_name", new_wifi).commit();
+                        sharedPreferences.edit().putString("home_wifi_id", new_wifi_id).commit();
+
                         Toast.makeText(getActivity(), "Changed your home wifi to " + new_wifi, Toast.LENGTH_SHORT).show();
+                        wifiChecker.checkWifiHome(getActivity());
+                        requestToServer(getActivity(), ServerAccess.ServerAction.SET_WIFI);
+                        requestToServer(getActivity(), ServerAccess.ServerAction.GET_FRIENDS_HOME);
                     }
                 });
             }

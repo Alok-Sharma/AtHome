@@ -25,7 +25,7 @@ public class WifiChangeReceiver extends BroadcastReceiver {
         checkWifiHome(context);
     }
 
-    public void setAtHomeStatus(Context context, Boolean status){
+    public void setAtHomeStatus(Context context, String status){
         serverIntent = new Intent(context, ServerAccess.class);
         serverIntent.putExtra("server_action", ServerAccess.ServerAction.SET_HOME_STATUS.toString());
         serverIntent.putExtra("server_action_arg", status);
@@ -37,30 +37,33 @@ public class WifiChangeReceiver extends BroadcastReceiver {
         String homeWifi = PreferenceManager.getDefaultSharedPreferences(context).getString("home_wifi_id", ""); //ALOKIMP
         ConnectivityManager connectionManager = (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = connectionManager.getActiveNetworkInfo();
+        Log.d("guitarWifi", "check wifi home: " + homeWifi);
+
         if(activeNetwork != null){
             boolean isWiFi = activeNetwork.getType() == ConnectivityManager.TYPE_WIFI;
             boolean isConnected = activeNetwork.isConnected();
-            Log.d("guitar", "active network not null, type: " + activeNetwork.getType() + " connected: " + isConnected);
+            Log.d("guitarWifi", "active network not null, type: " + activeNetwork.getType() + " connected: " + isConnected);
             String currentWifi;
             if(isWiFi && isConnected){
 //                currentWifi = getWifiName(context);
                 currentWifi = getWifiID(context); //ALOKIMP
-                Log.d("guitar", "broadcast bssid " + currentWifi);
+                Log.d("guitarWifi", "current wifi: " + currentWifi);
                 if(currentWifi.equals(homeWifi)){
                     //at home
-                    setAtHomeStatus(context, true);
+                    setAtHomeStatus(context, ServerAccess.AtHomeStatus.TRUE.toString());
                 }else{
                     //not at home
-                    setAtHomeStatus(context, false);
+                    setAtHomeStatus(context, ServerAccess.AtHomeStatus.FALSE.toString());
                 }
             }else{
                 // not connected to wifi.
-                setAtHomeStatus(context, false);
+                Log.d("guitarWifi", "not connected to a wifi");
+                setAtHomeStatus(context, ServerAccess.AtHomeStatus.FALSE.toString());
             }
         }else{
             //not connected to internet
-            Log.d("guitar", "active network null");
-            setAtHomeStatus(context, false);
+            Log.d("guitarWifi", "active network null");
+            setAtHomeStatus(context, ServerAccess.AtHomeStatus.FALSE.toString());
         }
     }
 
