@@ -62,7 +62,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/wifiButton"
             android:gravity="center"
-            android:text="Reset home WiFi"
+            android:text="Set home WiFi"
             android:onClick="setWifi"
             android:background="@drawable/button_border"
             android:paddingRight="10dp"

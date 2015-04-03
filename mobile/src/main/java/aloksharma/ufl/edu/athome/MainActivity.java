@@ -110,7 +110,7 @@ public class MainActivity extends Activity {
                 mainText.setText("Pssst,\nwhat's your\nhome WiFi?");
                 TextView tv = new TextView(this);
                 tv.setGravity(Gravity.CENTER);
-                tv.setText("Set your home WiFi from the settings option above.");
+                tv.setText("Set your home WiFi in the profile menu above.");
                 atHomeUsersLayout.addView(tv);
             }else if(friendsHome == null){
                 //Current user is the only one on this wifi.

@@ -30,11 +30,6 @@ import java.net.URL;
 
 /**
  * Created by Alok on 2/26/2015.
- * The settings fragment. Things to put in:
- *  - Current wifi.
- *  - Invisibility.
- *  - Logout
- *
  */
 
 public class CircularRevealingFragment extends Fragment{

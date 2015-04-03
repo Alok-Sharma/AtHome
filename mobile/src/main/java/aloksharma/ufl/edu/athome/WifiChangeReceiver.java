@@ -33,7 +33,6 @@ public class WifiChangeReceiver extends BroadcastReceiver {
     }
 
     public void checkWifiHome(Context context){
-//        String homeWifi = PreferenceManager.getDefaultSharedPreferences(context).getString("home_wifi", "");
         String homeWifi = PreferenceManager.getDefaultSharedPreferences(context).getString("home_wifi_id", ""); //ALOKIMP
         ConnectivityManager connectionManager = (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = connectionManager.getActiveNetworkInfo();

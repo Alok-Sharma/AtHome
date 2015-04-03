@@ -48,9 +48,11 @@ public class ServerAccess extends IntentService {
         List<AtHomeUser> friendsHome = new ArrayList<>();
 
         ParseQuery<ParseObject> friendQuery = new ParseQuery<>("AtHome");
-        String wifi_id = sharedPreferences.getString("home_wifi_id", null);
-        Log.d("guitar", "looking for wifi: " + wifi_id);
-        friendQuery.whereEqualTo("wifi", wifi_id);
+//        String wifi_id = sharedPreferences.getString("home_wifi_id", null);
+        String wifi_name = sharedPreferences.getString("home_wifi_name", null);
+        wifi_name = wifi_name.replace("\"", "");
+        Log.d("guitar", "looking for wifi: " + wifi_name);
+        friendQuery.whereEqualTo("wifi_name", wifi_name);
 
         try{
             friends = friendQuery.find();
@@ -71,7 +73,7 @@ public class ServerAccess extends IntentService {
                     atHomeUser.setEmail(friends.get(j).getString("Email"));
                     atHomeUser.setFirstName(friends.get(j).getString("First_Name"));
                     atHomeUser.setLastName(friends.get(j).getString("Last_Name"));
-                    atHomeUser.setWifi(friends.get(j).getString("wifi"));
+                    atHomeUser.setWifi(friends.get(j).getString("wifi_name"));
                     friendsHome.add(atHomeUser);
                 }else{
                     //If friend not home, do nothing.
@@ -205,12 +207,14 @@ public class ServerAccess extends IntentService {
         WifiChangeReceiver wifiChangeReceiver = new WifiChangeReceiver();
         String wifiID = wifiChangeReceiver.getWifiID(this);
         String wifiName = wifiChangeReceiver.getWifiName(this);
+        wifiName = wifiName.replace("\"", "");
         Log.d("guitar", "set home wifi: " + wifiID + " for the user: " + userObject.get("Email"));
         if(wifiID != null){
             userObject.put("wifi", wifiID);
             userObject.put("wifi_name", wifiName);
             SharedPreferences.Editor prefEdit = sharedPreferences.edit();
             prefEdit.putString("home_wifi_id", wifiID);
+            prefEdit.putString("home_wifi_name", wifiName);
             prefEdit.commit();
 
             Log.d("guitar", "saving wifi: " + wifiID);
