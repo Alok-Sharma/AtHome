@@ -4,9 +4,12 @@
     <color name="bg_settings">#F7475F</color>
     <color name="bg_settings_profile">#D13C50</color>
     <color name="bg_main_invisible">#6D6870</color>
-    <color name="bg_main_normal">#A8F0B8</color>
-    <color name="bg_login">#D4D980</color>
-    <color name="text">#000</color>
+    <color name="bg_main_normal">#009688</color>
+    <color name="bg_main_accent">#FFC107</color>
+    <color name="wave">#B2DFDB</color>
+    <color name="bg_main_dark">#00796B</color>
+    <color name="bg_login">#009688</color>
+    <color name="text">#FFFFFF</color>
     <color name="white">#FFFFFF</color>
     <color name="black">#000</color>
 

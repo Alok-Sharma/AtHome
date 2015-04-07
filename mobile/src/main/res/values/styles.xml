@@ -7,9 +7,9 @@
         <!--
          colorAccent is used as the default value for colorControlActivated
          which is used to color widgets-->
-        <!--<item name="colorAccent">@color/bg_main_normal</item>-->
+        <item name="colorAccent">@color/bg_main_accent</item>
         <!-- colorPrimaryDark is used to color the status bar -->
-        <!--<item name="colorPrimaryDark">@color/bg_main_normal</item>-->
+        <item name="colorPrimaryDark">@color/bg_main_dark</item>
     </style>
 
 </resources>

@@ -10,13 +10,17 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.graphics.Point;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.view.Display;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -31,21 +35,21 @@ import com.parse.ParseUser;
 
 import java.util.ArrayList;
 
-import mbanje.kurt.fabbutton.FabButton;
+import me.alexrs.wavedrawable.WaveDrawable;
 
 
 public class MainActivity extends Activity {
 
+    private final long WAVE_ANIMATION_DURATION = 1000;
     private TextView mainText;
     private CircularRevealingFragment circularFragment;
     private float x,y;
     private Boolean fragUp = false;
     private ServerBroadcastReceiver serverBroadcastReceiver;
-    private Intent serverIntent;
     private LinearLayout atHomeUsersLayout;
     private WifiChangeReceiver wifiChecker;
-    FabButton indeterminate;
     private SharedPreferences sharedPreferences;
+    private WaveDrawable wave;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,12 +59,12 @@ public class MainActivity extends Activity {
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         wifiChecker = new WifiChangeReceiver();
-        ImageButton button1;
-        button1 = (ImageButton)findViewById(R.id.addButton1);
-        indeterminate = (FabButton) findViewById(R.id.indeterminate);
+        ImageButton addFragmentButton, refreshButton;
+        addFragmentButton = (ImageButton)findViewById(R.id.addButton1);
+        refreshButton = (ImageButton) findViewById(R.id.refresh);
         mainText = (TextView)findViewById(R.id.mainText);
         atHomeUsersLayout = (LinearLayout)findViewById(R.id.atHomeUsers);
-        button1.setOnTouchListener(new View.OnTouchListener() {
+        addFragmentButton.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 x = v.getLeft() + event.getX();
@@ -69,11 +73,18 @@ public class MainActivity extends Activity {
             }
         });
 
-        indeterminate.setOnClickListener(new View.OnClickListener() {
+        Display display = getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        int screenHeight = size.y;
+        wave = new WaveDrawable(getResources().getColor(R.color.wave), screenHeight, WAVE_ANIMATION_DURATION); //(color,radius,time)
+        wave.setWaveInterpolator(new DecelerateInterpolator());
+        refreshButton.setBackgroundDrawable(wave);
+        refreshButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                indeterminate.showProgress(true);
                 requestToServer(getApplicationContext(), ServerAccess.ServerAction.GET_FRIENDS_HOME);
+                toggleWaveAnimation(true);
             }
         });
 
@@ -215,10 +226,40 @@ public class MainActivity extends Activity {
             if(action.equals(ServerAccess.ServerAction.GET_FRIENDS_HOME.toString())){
                 ArrayList<AtHomeUser> friendsHome = intent.getParcelableArrayListExtra("data");
                 changeText(friendsHome);
-                indeterminate.showProgress(false);
+                toggleWaveAnimation(false);
             }
         }
     }
+
+    long timeOfStart = 0;
+    private void toggleWaveAnimation(Boolean toggle){
+        if(!toggle) {
+            if (wave != null && wave.isAnimationRunning()) {
+                final Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        wave.stopAnimation();
+                    }
+                }, calculateTimeToStopWave(System.currentTimeMillis(), timeOfStart));
+
+            }
+        }else{
+            wave.startAnimation();
+            timeOfStart = System.currentTimeMillis();
+            Log.d("guitarTime", "time of start: " + timeOfStart);
+        }
+    }
+
+    private long calculateTimeToStopWave(long stopTime, long startTime){
+        Log.d("guitarTime", "stoptime: " + stopTime + " start time: " + startTime);
+        long temp = stopTime - startTime;
+        temp = temp % WAVE_ANIMATION_DURATION;
+        long result = WAVE_ANIMATION_DURATION - temp;
+        Log.d("guitarTime", "result: " + result);
+        return result;
+    }
+
 
     public static class ChangeWifiDialogFragment extends DialogFragment {
         @Override
