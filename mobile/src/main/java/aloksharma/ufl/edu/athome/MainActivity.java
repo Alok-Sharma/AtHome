@@ -27,6 +27,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.daimajia.androidanimations.library.Techniques;
+import com.daimajia.androidanimations.library.YoYo;
 import com.facebook.Session;
 import com.parse.ParseAnalytics;
 import com.parse.ParseException;
@@ -40,8 +42,8 @@ import me.alexrs.wavedrawable.WaveDrawable;
 
 public class MainActivity extends Activity {
 
-    private final long WAVE_ANIMATION_DURATION = 1000;
-    private TextView mainText;
+    private final long WAVE_ANIMATION_DURATION = 700;
+    private TextView mainTextLine1, mainTextLine2, mainTextLine3, auxText;
     private CircularRevealingFragment circularFragment;
     private float x,y;
     private Boolean fragUp = false;
@@ -62,7 +64,12 @@ public class MainActivity extends Activity {
         ImageButton addFragmentButton, refreshButton;
         addFragmentButton = (ImageButton)findViewById(R.id.addButton1);
         refreshButton = (ImageButton) findViewById(R.id.refresh);
-        mainText = (TextView)findViewById(R.id.mainText);
+        mainTextLine1 = (TextView)findViewById(R.id.mainTextLine1);
+        mainTextLine2 = (TextView)findViewById(R.id.mainTextLine2);
+        mainTextLine3 = (TextView)findViewById(R.id.mainTextLine3);
+        auxText = new TextView(this);
+        auxText.setGravity(Gravity.CENTER);
+        auxText.setTextColor(getResources().getColor(R.color.text));
         atHomeUsersLayout = (LinearLayout)findViewById(R.id.atHomeUsers);
         addFragmentButton.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -106,37 +113,55 @@ public class MainActivity extends Activity {
     public void changeText(ArrayList<AtHomeUser> friendsHome){
         atHomeUsersLayout.removeAllViews();
         RelativeLayout mainContainer = (RelativeLayout)findViewById(R.id.mainContainer);
+        mainTextLine1.setVisibility(View.GONE);mainTextLine2.setVisibility(View.GONE);mainTextLine3.setVisibility(View.GONE);
 
         if(sharedPreferences.getBoolean("invisible", false)){
-            mainText.setText("Yay!\nyou're invisible!");
+            mainTextLine1.setVisibility(View.VISIBLE);mainTextLine2.setVisibility(View.VISIBLE);mainTextLine3.setVisibility(View.VISIBLE);
+            mainTextLine1.setText("Yay!");
+            mainTextLine2.setText("you're");
+            mainTextLine3.setText("invisible!");
             mainContainer.setBackgroundColor(getResources().getColor(R.color.bg_main_invisible));
-            TextView tv = new TextView(this);
-            tv.setGravity(Gravity.CENTER);
-            tv.setText("They can't see you, you can't see them.");
-            atHomeUsersLayout.addView(tv);
-
+            auxText.setText("They can't see you, you can't see them.");
+            atHomeUsersLayout.addView(auxText);
+            toggleTextAnimation(false);
         }else{
             mainContainer.setBackgroundColor(getResources().getColor(R.color.bg_main_normal));
             if(sharedPreferences.getString("home_wifi_id", null) == null){
-                mainText.setText("Pssst,\nwhat's your\nhome WiFi?");
-                TextView tv = new TextView(this);
-                tv.setGravity(Gravity.CENTER);
-                tv.setText("Set your home WiFi in the profile menu above.");
-                atHomeUsersLayout.addView(tv);
+                mainTextLine1.setVisibility(View.VISIBLE);mainTextLine2.setVisibility(View.VISIBLE);mainTextLine3.setVisibility(View.VISIBLE);
+                mainTextLine1.setText("Pssst,");
+                mainTextLine2.setText("what's your");
+                mainTextLine3.setText("home WiFi?");
+                auxText.setText("Set your home WiFi in the profile menu above.");
+                atHomeUsersLayout.addView(auxText);
+                toggleTextAnimation(false);
             }else if(friendsHome == null){
                 //Current user is the only one on this wifi.
-                mainText.setText("You are\nthe 1st one\non this WiFi");
+                mainTextLine1.setVisibility(View.VISIBLE);mainTextLine2.setVisibility(View.VISIBLE);mainTextLine3.setVisibility(View.VISIBLE);
+                mainTextLine1.setText("You are");
+                mainTextLine2.setText("the 1st one");
+                mainTextLine3.setText("on this WiFi");
                 mainContainer.setBackgroundColor(getResources().getColor(R.color.bg_main_invisible));
-                TextView tv = new TextView(this);
-                tv.setGravity(Gravity.CENTER);
-                tv.setText("Share this app with others in your home. No one else found on this WiFi for now.");
-                atHomeUsersLayout.addView(tv);
+                auxText.setText("Share this app with others in your home. No one else found on this WiFi for now.");
+                atHomeUsersLayout.addView(auxText);
+                toggleTextAnimation(false);
             }else if(friendsHome.size() == 0){
-                mainText.setText("Nope,\nno one\nis home");
+                mainTextLine1.setVisibility(View.VISIBLE);mainTextLine2.setVisibility(View.VISIBLE);mainTextLine3.setVisibility(View.VISIBLE);
+                mainTextLine1.setText("Nope,");
+                mainTextLine2.setText("no one");
+                mainTextLine3.setText("is home");
+                toggleTextAnimation(true);
             }else if (friendsHome.size() == 1){
-                mainText.setText("Yep,\n1 person\nis home");
+                mainTextLine1.setVisibility(View.VISIBLE);mainTextLine2.setVisibility(View.VISIBLE);mainTextLine3.setVisibility(View.VISIBLE);
+                mainTextLine1.setText("Yep,");
+                mainTextLine2.setText("1 person");
+                mainTextLine3.setText("is home");
+                toggleTextAnimation(true);
             }else{
-                mainText.setText("Yep,\n" + friendsHome.size() + " people\nare home");
+                mainTextLine1.setVisibility(View.VISIBLE);mainTextLine2.setVisibility(View.VISIBLE);mainTextLine3.setVisibility(View.VISIBLE);
+                mainTextLine1.setText("Yep,");
+                mainTextLine2.setText(friendsHome.size() + " people");
+                mainTextLine3.setText("are home");
+                toggleTextAnimation(true);
             }
 
             if(friendsHome != null) {
@@ -248,6 +273,51 @@ public class MainActivity extends Activity {
             wave.startAnimation();
             timeOfStart = System.currentTimeMillis();
             Log.d("guitarTime", "time of start: " + timeOfStart);
+        }
+    }
+
+    private void toggleTextAnimation(Boolean type){
+
+        if(!type){
+            YoYo.with(Techniques.Shake).duration(400).playOn(mainTextLine1);
+            YoYo.with(Techniques.Shake).duration(500).playOn(mainTextLine2);
+            YoYo.with(Techniques.Shake).duration(600).playOn(mainTextLine3);
+        }else{
+
+            YoYo.with(Techniques.FadeOutUp).duration(400).playOn(mainTextLine1);
+            YoYo.with(Techniques.FadeOutUp).duration(500).playOn(mainTextLine2);
+            YoYo.with(Techniques.FadeOutUp).duration(600).playOn(mainTextLine3);
+            YoYo.with(Techniques.FadeOutUp).duration(700).playOn(atHomeUsersLayout);
+
+            final Handler handler = new Handler();
+
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    YoYo.with(Techniques.FadeInUp).duration(300).playOn(mainTextLine1);
+                }
+            }, 500);
+
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    YoYo.with(Techniques.FadeInUp).duration(300).playOn(mainTextLine2);
+                }
+            }, 600);
+
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    YoYo.with(Techniques.FadeInUp).duration(300).playOn(mainTextLine3);
+                }
+            }, 700);
+
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    YoYo.with(Techniques.FadeInUp).duration(300).playOn(atHomeUsersLayout);
+                }
+            }, 700);
         }
     }
 

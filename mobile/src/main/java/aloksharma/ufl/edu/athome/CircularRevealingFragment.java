@@ -92,7 +92,7 @@ public class CircularRevealingFragment extends Fragment{
         nameText.setText(sharedPreferences.getString("user_fname", "") + " " +sharedPreferences.getString("user_lname", ""));
 
         profilePic = (ImageView)rootView.findViewById(R.id.profilePic);
-        getFacebookProfilePicture();
+//        getFacebookProfilePicture();
 
         serverIntent = new Intent(getActivity(), ServerAccess.class);
         SwitchCompat invisibleSwitch = (SwitchCompat)rootView.findViewById(R.id.invisibleSwitch);

@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <color name="bg_settings">#F7475F</color>
-    <color name="bg_settings_profile">#D13C50</color>
+    <!--<color name="bg_settings">#F7475F</color>-->
+    <!--<color name="bg_settings_profile">#D13C50</color>-->
+    <color name="bg_settings">#00796B</color>
+    <color name="bg_settings_profile">#00796B</color>
     <color name="bg_main_invisible">#6D6870</color>
     <color name="bg_main_normal">#009688</color>
     <color name="bg_main_accent">#FFC107</color>
