@@ -50,7 +50,9 @@ public class ServerAccess extends IntentService {
         ParseQuery<ParseObject> friendQuery = new ParseQuery<>("AtHome");
 //        String wifi_id = sharedPreferences.getString("home_wifi_id", null);
         String wifi_name = sharedPreferences.getString("home_wifi_name", null);
-        wifi_name = wifi_name.replace("\"", "");
+        if(wifi_name != null){
+            wifi_name = wifi_name.replace("\"", "");
+        }
         Log.d("guitar", "looking for wifi: " + wifi_name);
         friendQuery.whereEqualTo("wifi_name", wifi_name);
 
@@ -159,6 +161,13 @@ public class ServerAccess extends IntentService {
                 newUser.put("Last_Name", last_name);
                 newUser.pin(); //save this offline in the datastore, and then save in cloud.
                 newUser.save();
+
+                SharedPreferences.Editor sharedPrefEditor = sharedPreferences.edit();
+                sharedPrefEditor.putString("user_fname", first_name);
+                sharedPrefEditor.putString("user_lname", last_name);
+                sharedPrefEditor.putString("home_wifi_id", null);
+                sharedPrefEditor.putString("home_wifi_name", null);
+                sharedPrefEditor.commit();
             }else{
                 //Email already exists on server. Do not push.
                 Log.d("guitar", "user already exists.");
@@ -241,10 +250,12 @@ public class ServerAccess extends IntentService {
             List<String> friendList = getFriends(getUser(userEmail));
             Log.d("guitarintent", "get friends intent: " + friendList);
             responseIntent.putStringArrayListExtra("data", new ArrayList<>(friendList));
-        }else if(action.equals(ServerAction.ADD_USER.toString())){
+        }
+        else if(action.equals(ServerAction.ADD_USER.toString())){
             Log.d("guitarintent", "add user intent");
             putUser(intent.getStringExtra("email"), intent.getStringExtra("fname"), intent.getStringExtra("lname"));
-        }else if(action.equals(ServerAction.GET_FRIENDS_HOME.toString())){
+        }
+        else if(action.equals(ServerAction.GET_FRIENDS_HOME.toString())){
             List<AtHomeUser> friendsHome = getFriendsHome(getUser(userEmail));
             Log.d("guitarintent", "get friends home: " + friendsHome);
             if(friendsHome == null){
@@ -253,17 +264,21 @@ public class ServerAccess extends IntentService {
             }else{
                 responseIntent.putParcelableArrayListExtra("data", new ArrayList<>(friendsHome));
             }
-        }else if(action.equals(ServerAction.SET_HOME_STATUS.toString())){
+        }
+        else if(action.equals(ServerAction.SET_HOME_STATUS.toString())){
             Log.d("guitarintent", "set home status intent: " + intent.getStringExtra("server_action_arg"));
             setAtHomeStatus(getUser(userEmail), intent.getStringExtra("server_action_arg"));
-        }else if(action.equals(ServerAction.SET_INVISIBLE.toString())){
+        }
+        else if(action.equals(ServerAction.SET_INVISIBLE.toString())) {
             Log.d("guitarintent", "set invisible");
             setAtHomeStatus(getUser(userEmail), AtHomeStatus.INVISIBLE.toString());
-        }else if(action.equals(ServerAction.GET_USER.toString())){
+        }
+        else if(action.equals(ServerAction.GET_USER.toString())){
             Log.d("guitarintent", "get user intent");
             ParseObject userObject = getUser(userEmail);
             //Take data out of userobject and send broadcast.
-        }else if(action.equals(ServerAction.SET_WIFI.toString())) {
+        }
+        else if(action.equals(ServerAction.SET_WIFI.toString())) {
             Log.d("guitarintent", "set wifi intent");
             setHomeWifi(getUser(userEmail));
         }

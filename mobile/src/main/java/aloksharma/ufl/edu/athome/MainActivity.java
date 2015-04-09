@@ -238,7 +238,7 @@ public class MainActivity extends Activity {
         }
         fbs.closeAndClearTokenInformation();
         sharedPreferences.edit().clear().commit();
-        Intent toLoginActivity = new Intent(this, LoginActivity.class);
+        Intent toLoginActivity = new Intent(this, SignInActivity.class);
         startActivity(toLoginActivity);
         finish();
     }
