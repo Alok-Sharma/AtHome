@@ -90,8 +90,14 @@ public class MainActivity extends Activity {
         refreshButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                requestToServer(getApplicationContext(), ServerAccess.ServerAction.GET_FRIENDS_HOME);
-                toggleWaveAnimation(true);
+                if(!sharedPreferences.getBoolean("invisible", false)){
+                    //if not invisible, then get friends home, and do the wave animation.
+                    requestToServer(getApplicationContext(), ServerAccess.ServerAction.GET_FRIENDS_HOME);
+                    toggleWaveAnimation(true);
+                }else{
+                    //else do nothing, except for shake text animation.
+                    toggleTextAnimation(false);
+                }
             }
         });
 
@@ -252,6 +258,8 @@ public class MainActivity extends Activity {
                 ArrayList<AtHomeUser> friendsHome = intent.getParcelableArrayListExtra("data");
                 changeText(friendsHome);
                 toggleWaveAnimation(false);
+            }else if(action.equals(ServerAccess.ServerAction.SET_INVISIBLE.toString())){
+                changeText(null);
             }
         }
     }
@@ -350,7 +358,7 @@ public class MainActivity extends Activity {
                 dialog_message = "Set " + new_wifi + " as your home Wifi?";
                 dialog_cancel = "Cancel";
                 //TODO: Important- Using same code here and in the else method. Need to restructure the if clauses.
-                builder.setPositiveButton("Change", new DialogInterface.OnClickListener() {
+                builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         TextView currentWifiText = (TextView)getActivity().findViewById(R.id.currentWifi);
                         currentWifiText.setText(new_wifi);
@@ -370,7 +378,7 @@ public class MainActivity extends Activity {
                 dialog_message = "Change your home wifi from " + old_wifi + " to " + new_wifi + "?";
                 dialog_cancel = "Cancel";
 
-                builder.setPositiveButton("Change", new DialogInterface.OnClickListener() {
+                builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         TextView currentWifiText = (TextView)getActivity().findViewById(R.id.currentWifi);
                         currentWifiText.setText(new_wifi);

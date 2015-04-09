@@ -1,151 +1,158 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent"  tools:context=".MainActivity$PlaceholderFragment"
-    android:id="@+id/rel"
-    android:clickable="true"
-    android:elevation="10dp"
-    android:background="@color/bg_settings"
-    >
+<io.codetail.widget.RevealFrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/revealFrame">
 
-    <ImageButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/removeButton"
-        android:onClick="removeFragment"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentLeft="true"
-        android:src="@drawable/ic_arrow_back_black_36dp"
-        android:background="@null"/>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Large Text"
-        android:id="@+id/settingsName"
-        android:layout_below="@+id/removeButton"
-        android:layout_centerHorizontal="true" />
-
-    <RelativeLayout
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/settingsName"
-        android:layout_centerHorizontal="true"
-        android:id="@+id/profileImageLayout"
-        android:background="@color/bg_settings_profile"
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+        android:layout_height="match_parent"  tools:context=".MainActivity$PlaceholderFragment"
+        android:id="@+id/rel"
+        android:clickable="true"
+        android:background="@color/bg_settings"
         >
 
-        <ImageView
+        <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/profilePic"
-            android:layout_gravity="center"
-            android:src="@drawable/com_facebook_profile_picture_blank_portrait"
-            android:layout_centerVertical="true"
+            android:id="@+id/removeButton"
+            android:onClick="removeFragment"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:src="@drawable/ic_arrow_back_black_36dp"
+            android:background="@null"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="Large Text"
+            android:id="@+id/settingsName"
+            android:layout_below="@+id/removeButton"
             android:layout_centerHorizontal="true" />
 
-    </RelativeLayout>
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/settingsName"
+            android:layout_centerHorizontal="true"
+            android:id="@+id/profileImageLayout"
+            android:background="@color/bg_settings_profile"
+            >
 
-    <RelativeLayout
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:id="@+id/wifiButtonLayout"
-        android:layout_below="@+id/profileImageLayout"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp">
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/profilePic"
+                android:layout_gravity="center"
+                android:src="@drawable/com_facebook_profile_picture_blank_portrait"
+                android:layout_centerVertical="true"
+                android:layout_centerHorizontal="true" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:id="@+id/wifiButtonLayout"
+            android:layout_below="@+id/profileImageLayout"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp">
+
+            <Button
+                android:layout_width="wrap_content"
+                android:textSize="12dp"
+                android:layout_height="wrap_content"
+                android:id="@+id/wifiButton"
+                android:gravity="center"
+                android:text="Set home WiFi"
+                android:onClick="setWifi"
+                android:background="@drawable/button_border"
+                android:paddingRight="10dp"
+                android:paddingLeft="10dp"
+                android:layout_centerVertical="true"
+                android:layout_centerHorizontal="true" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_below="@+id/wifiButtonLayout"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:paddingBottom="5dp"
+            android:id="@+id/CurrentWifiLayout">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Current home Wifi:"
+                android:textSize="20dp"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:textColor="@color/text"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/currentWifi"
+                android:textSize="20dp"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:textColor="@color/text"/>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_below="@+id/CurrentWifiLayout"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Invisible to all"
+                android:textSize="20dp"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:textColor="@color/text"/>
+
+            <android.support.v7.widget.SwitchCompat
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/invisibleSwitch"
+                android:textOff="Off"
+                android:textOn="On"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                />
+
+        </RelativeLayout>
 
         <Button
-            android:layout_width="wrap_content"
-            android:textSize="12dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/wifiButton"
-            android:gravity="center"
-            android:text="Set home WiFi"
-            android:onClick="setWifi"
+            android:text="Logout"
+            android:onClick="logout"
+            android:id="@+id/LogoutButton"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
             android:background="@drawable/button_border"
+            android:layout_margin="10dp"
+            android:layout_marginTop="25dp"
+            android:layout_marginBottom="25dp"
             android:paddingRight="10dp"
-            android:paddingLeft="10dp"
-            android:layout_centerVertical="true"
-            android:layout_centerHorizontal="true" />
+            android:paddingLeft="10dp"/>
 
     </RelativeLayout>
 
-    <RelativeLayout
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_below="@+id/wifiButtonLayout"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp"
-        android:paddingBottom="5dp"
-        android:id="@+id/CurrentWifiLayout">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Current home Wifi:"
-            android:textSize="20dp"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_centerVertical="true"
-            android:textColor="@color/text"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/currentWifi"
-            android:textSize="20dp"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"
-            android:textColor="@color/text"/>
-
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_below="@+id/CurrentWifiLayout"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Invisible to all"
-            android:textSize="20dp"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_centerVertical="true"
-            android:textColor="@color/text"/>
-
-        <android.support.v7.widget.SwitchCompat
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/invisibleSwitch"
-            android:textOff="Off"
-            android:textOn="On"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
-            />
-
-    </RelativeLayout>
-
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Logout"
-        android:onClick="logout"
-        android:id="@+id/LogoutButton"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:background="@drawable/button_border"
-        android:layout_margin="10dp"
-        android:layout_marginTop="25dp"
-        android:layout_marginBottom="25dp"
-        android:paddingRight="10dp"
-        android:paddingLeft="10dp"/>
-
-</RelativeLayout>
+</io.codetail.widget.RevealFrameLayout>

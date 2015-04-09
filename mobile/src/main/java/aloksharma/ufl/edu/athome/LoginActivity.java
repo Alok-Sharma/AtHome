@@ -101,13 +101,13 @@ public class LoginActivity extends Activity {
             public void done(ParseUser user, ParseException err) {
                 if (user == null) {
                     Log.d("MyApp", "Uh oh. The user cancelled the Facebook login.");
+                    return;
                 } else if (user.isNew()) {
                     Log.d("MyApp", "User signed up and logged in through Facebook! ");
-                    makeMeRequest();
                 } else {
                     Log.d("MyApp", "User logged in through Facebook! ");
-                    makeMeRequest();
                 }
+                makeMeRequest();
             }
         });
     }

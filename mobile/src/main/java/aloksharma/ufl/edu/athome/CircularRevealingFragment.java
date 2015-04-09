@@ -1,6 +1,5 @@
 package aloksharma.ufl.edu.athome;
 
-import android.animation.Animator;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
@@ -9,14 +8,12 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.widget.SwitchCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
@@ -27,6 +24,8 @@ import android.widget.TextView;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+
+import io.codetail.animation.SupportAnimator;
 
 /**
  * Created by Alok on 2/26/2015.
@@ -72,14 +71,12 @@ public class CircularRevealingFragment extends Fragment{
                 cy = getArguments().getInt("cy");
                 // get the hypothenuse so the radius is from one corner to the other
                 int radius = (int)Math.hypot(right, bottom);
-
-                // TODO: Handle animation for pre lollipop devices.
-                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    Animator reveal = ViewAnimationUtils.createCircularReveal(v, cx, cy, 0, radius);
-                    reveal.setInterpolator(new DecelerateInterpolator(1.5f));
-                    reveal.setDuration(700);
-                    reveal.start();
-                }
+                Log.d("guitarview", "id: " + v.getId() + " " + R.id.rel);
+                View myview = getView().findViewById(R.id.rel);
+                SupportAnimator reveal = io.codetail.animation.ViewAnimationUtils.createCircularReveal(myview, cx, cy, 0, radius);
+                reveal.setInterpolator(new DecelerateInterpolator(1.5f));
+                reveal.setDuration(700);
+                reveal.start();
             }
         });
 
@@ -105,7 +102,7 @@ public class CircularRevealingFragment extends Fragment{
                     Log.d("guitar", "ischecked true");
                     sharedPreferences.edit().putBoolean("invisible", true).commit();
                     requestToServer(ServerAccess.ServerAction.SET_INVISIBLE);
-                    requestToServer(ServerAccess.ServerAction.GET_FRIENDS_HOME);
+//                    requestToServer(ServerAccess.ServerAction.GET_FRIENDS_HOME);//Why?
                 }else{
                     Log.d("guitar", "ischecked false");
                     sharedPreferences.edit().putBoolean("invisible", false).commit();
@@ -165,18 +162,17 @@ public class CircularRevealingFragment extends Fragment{
      */
     public void removeYourself(){
         final CircularRevealingFragment mfragment = this;
-        Animator unreveal = null;
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            unreveal = mfragment.prepareUnrevealAnimator(cx, cy);
-        }
+        SupportAnimator unreveal = null;
+        unreveal = mfragment.prepareUnrevealAnimator(cx, cy);
+
         if(unreveal != null) {
-            unreveal.addListener(new Animator.AnimatorListener() {
+            unreveal.addListener(new SupportAnimator.AnimatorListener() {
                 @Override
-                public void onAnimationStart(Animator animation) {
+                public void onAnimationStart() {
                 }
 
                 @Override
-                public void onAnimationEnd(Animator animation) {
+                public void onAnimationEnd() {
                     // removeFragment the fragment only when the animation finishes
                     FragmentManager fragmentManager = getFragmentManager();
                     if(fragmentManager != null){
@@ -187,11 +183,11 @@ public class CircularRevealingFragment extends Fragment{
                 }
 
                 @Override
-                public void onAnimationCancel(Animator animation) {
+                public void onAnimationCancel() {
                 }
 
                 @Override
-                public void onAnimationRepeat(Animator animation) {
+                public void onAnimationRepeat() {
                 }
             });
             unreveal.start();
@@ -213,14 +209,14 @@ public class CircularRevealingFragment extends Fragment{
      * @param cy center y of the circle (or where the view was touched)
      * @return Animator object that will be used for the animation
      */
-    public Animator prepareUnrevealAnimator(float cx, float cy)
+    public SupportAnimator prepareUnrevealAnimator(float cx, float cy)
     {
 
         int radius = getEnclosingCircleRadius(getView(), (int)cx, (int)cy);
         if(radius == -1){
             return null;
         }
-        Animator anim = ViewAnimationUtils.createCircularReveal(getView(), (int) cx, (int) cy, radius, 0);
+        SupportAnimator anim = io.codetail.animation.ViewAnimationUtils.createCircularReveal(getView().findViewById(R.id.rel), (int) cx, (int) cy, radius, 0);
         anim.setInterpolator(new AccelerateInterpolator(1.5f));
         anim.setDuration(700);
         return anim;
