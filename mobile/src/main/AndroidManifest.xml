@@ -6,6 +6,8 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+    <uses-permission android:name="android.permission.RECEIVE_SMS"/>
 
     <application tools:replace="android:icon,label"
         android:name=".App"
@@ -52,9 +54,16 @@
         </activity>
 
         <activity
-            android:name="com.facebook.LoginActivity"
+            android:name="com.facebook.FacebookActivity"
+            android:configChanges=
+                "keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"
+            android:label="@string/app_name"
             >
         </activity>
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="4f2213328d2b9e4d7377a67bdec824df713f8863" />
     </application>
 
 </manifest>

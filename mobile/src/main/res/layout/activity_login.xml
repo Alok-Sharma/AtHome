@@ -75,8 +75,8 @@
 
         </LinearLayout>
 
-        <com.facebook.widget.LoginButton
-            android:id="@+id/authButton"
+        <com.facebook.login.widget.LoginButton
+            android:id="@+id/login_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/loginButtons"
@@ -84,6 +84,12 @@
             android:layout_alignParentStart="true"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true" />
+
+        <!--<com.digits.sdk.android.DigitsAuthButton-->
+            <!--android:id="@+id/auth_button"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_below="@id/authButton"/>-->
 
     </RelativeLayout>
 

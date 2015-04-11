@@ -36,7 +36,7 @@ public class ServerAccess extends IntentService {
     public ServerAccess() {
         super("ServerAccess");
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getContext());
-        userEmail = sharedPreferences.getString("user_email", "");
+        userEmail = sharedPreferences.getString("user_email", null);
     }
 
     /*
@@ -54,8 +54,12 @@ public class ServerAccess extends IntentService {
             wifi_name = wifi_name.replace("\"", "");
         }
         Log.d("guitar", "looking for wifi: " + wifi_name);
-        friendQuery.whereEqualTo("wifi_name", wifi_name);
 
+        if(wifi_name == null){
+            return null;
+        }
+
+        friendQuery.whereEqualTo("wifi_name", wifi_name);
         try{
             friends = friendQuery.find();
             Log.d("guitar", "fetched " + friends.size() + " friends");
@@ -119,6 +123,7 @@ public class ServerAccess extends IntentService {
             Log.d("guitar", "user doesnt exist in local datastore.");
             ParseQuery<ParseObject> userQueryOnline = ParseQuery.getQuery("AtHome");
             userQueryOnline.whereEqualTo("Email", userEmail);
+            Log.d("guitarError", "email: " + userEmail);
             List<ParseObject> parseObjectsOnline = new ArrayList<>();
             try{
                 parseObjectsOnline = userQueryOnline.find();
@@ -190,7 +195,6 @@ public class ServerAccess extends IntentService {
         if(!statusOnServer.equals(status)){
             //send to server now.
             if(status.equals(AtHomeStatus.INVISIBLE.toString())){
-                //status = null means invisibility has been set.
                 userObject.put("Status", AtHomeStatus.INVISIBLE.toString());
                 Log.d("guitar", "changed to invisible on server.");
             }else if(!sharedPreferences.getBoolean("invisible", false)){
@@ -266,7 +270,7 @@ public class ServerAccess extends IntentService {
             }
         }
         else if(action.equals(ServerAction.SET_HOME_STATUS.toString())){
-            Log.d("guitarintent", "set home status intent: " + intent.getStringExtra("server_action_arg"));
+            Log.d("guitarintent", "set home status intent: " + intent.getStringExtra("server_action_arg") + " email: " + userEmail);
             setAtHomeStatus(getUser(userEmail), intent.getStringExtra("server_action_arg"));
         }
         else if(action.equals(ServerAction.SET_INVISIBLE.toString())) {

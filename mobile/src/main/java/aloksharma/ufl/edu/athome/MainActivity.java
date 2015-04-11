@@ -29,7 +29,9 @@ import android.widget.Toast;
 
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
-import com.facebook.Session;
+//import com.facebook.Session;
+import com.facebook.AccessToken;
+import com.facebook.login.LoginManager;
 import com.parse.ParseAnalytics;
 import com.parse.ParseException;
 import com.parse.ParseObject;
@@ -225,18 +227,25 @@ public class MainActivity extends Activity {
     Called by the logout button in fragment_main.xml
      */
     public void logout(View v){
+        /*
+        TODO: Have a prelogout function that sets status to false. Make a new ServerAccess function
+        that sends a broadcast when this is done. On that broadcast continue the rest of logout.
+        Q: What if youre not connected to the internet? Cant logout?
+         */
+
+//        wifiChecker.setAtHomeStatus(this, ServerAccess.AtHomeStatus.FALSE.toString());
         ParseUser.logOut();
         try{
             ParseObject.unpinAll();
         }catch (ParseException e){
             Log.d("guitarError", "unable to unpin all in logout method: " + e.getMessage());
         }
-        com.facebook.Session fbs = com.facebook.Session.getActiveSession();
-        if (fbs == null) {
-            fbs = new Session(this);
-            com.facebook.Session.setActiveSession(fbs);
+
+        AccessToken token = AccessToken.getCurrentAccessToken();
+        if(token != null){
+            LoginManager.getInstance().logOut();
         }
-        fbs.closeAndClearTokenInformation();
+
         sharedPreferences.edit().clear().commit();
         Intent toLoginActivity = new Intent(this, SignInActivity.class);
         startActivity(toLoginActivity);
@@ -256,6 +265,7 @@ public class MainActivity extends Activity {
             String action = intent.getStringExtra("server_action");
             if(action.equals(ServerAccess.ServerAction.GET_FRIENDS_HOME.toString())){
                 ArrayList<AtHomeUser> friendsHome = intent.getParcelableArrayListExtra("data");
+                wifiChecker.checkWifiHome(getApplicationContext());
                 changeText(friendsHome);
                 toggleWaveAnimation(false);
             }else if(action.equals(ServerAccess.ServerAction.SET_INVISIBLE.toString())){

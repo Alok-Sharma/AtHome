@@ -11,13 +11,16 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.facebook.Request;
-import com.facebook.Response;
-import com.facebook.model.GraphUser;
+import com.facebook.AccessToken;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
+import com.facebook.login.widget.LoginButton;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseFacebookUtils;
 import com.parse.ParseUser;
+
+import org.json.JSONObject;
 
 import java.util.Arrays;
 
@@ -39,8 +42,6 @@ public class SignInActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         toMainActivity = new Intent(this, MainActivity.class);
-//        toMainActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-
         sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
 
         if(ParseUser.getCurrentUser() != null){
@@ -51,6 +52,29 @@ public class SignInActivity extends Activity {
             startActivity(toMainActivity);
             finish();
         }
+
+        LoginButton fbLogin = (LoginButton)findViewById(R.id.login_button);
+        fbLogin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                fbLogin();
+            }
+        });
+
+//        DigitsAuthButton digitsButton = (DigitsAuthButton) findViewById(R.id.auth_button);
+//        digitsButton.setCallback(new AuthCallback() {
+//            @Override
+//            public void success(DigitsSession session, String phoneNumber) {
+//                // Do something with the session and phone number
+//                Log.d("guitarDig", "success" + phoneNumber);
+//            }
+//
+//            @Override
+//            public void failure(DigitsException exception) {
+//                // Do something on failure
+//                Log.d("guitarDig", "fail: " + exception.getMessage());
+//            }
+//        });
 
         username=(EditText)findViewById(R.id.username);
         password=(EditText)findViewById(R.id.password);
@@ -89,49 +113,49 @@ public class SignInActivity extends Activity {
         });
     }
 
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Log.d("guitarfb", "req: " + requestCode);
-        if (requestCode == 32665) //weird fix for a weird parse problem. Read more about it at: https://www.parse.com/questions/nullpointerexceptions-from-the-facebook-authentication
-            ParseFacebookUtils.finishAuthentication(requestCode, resultCode, data);
-        super.onActivityResult(requestCode, resultCode, data);
-        ParseFacebookUtils.logIn(Arrays.asList("email", ParseFacebookUtils.Permissions.User.ABOUT_ME, ParseFacebookUtils.Permissions.User.EMAIL), this, new LogInCallback() {
+    public void fbLogin(){
+        ParseFacebookUtils.logInWithReadPermissionsInBackground(this, Arrays.asList("email", "public_profile"), new LogInCallback() {
             @Override
             public void done(ParseUser user, ParseException err) {
                 if (user == null) {
                     Log.d("MyApp", "Uh oh. The user cancelled the Facebook login.");
                     return;
                 } else {
-                    fetchUserDetails(user.isNew());
+                    Log.d("MyApp", "login worked " + user.getEmail());
+                    if(user.isNew()){
+                        fetchFBUserDetails();
+                    }else{
+                        user.saveInBackground();
+                        user.pinInBackground();
+                        sharedPrefEditor = sharedPref.edit();
+                        sharedPrefEditor.putString("user_email", user.getEmail());
+                        sharedPrefEditor.commit();
+                        fetchExistingUser();
+                        startActivity(toMainActivity);
+                        finish();
+                    }
+
                 }
             }
         });
     }
 
-    public void fetchUserDetails(final Boolean newUser){
-        if (ParseFacebookUtils.getSession().isOpened()) {
-            Request.newMeRequest(ParseFacebookUtils.getSession(), new Request.GraphUserCallback() {
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.d("guitarfb", "req: " + requestCode);
+        super.onActivityResult(requestCode, resultCode, data);
+        ParseFacebookUtils.onActivityResult(requestCode, resultCode, data);
+    }
+
+    public void fetchFBUserDetails(){
+        if (AccessToken.getCurrentAccessToken() != null) {
+            GraphRequest.newMeRequest(AccessToken.getCurrentAccessToken(), new GraphRequest.GraphJSONObjectCallback(){
 
                 @Override
-                public void onCompleted(GraphUser graphUser, Response response) {
-
-                    String email = graphUser.getProperty("email").toString();
-                    ParseUser.getCurrentUser().put("email", email); //populate the User table of our Parse database.
-                    ParseUser.getCurrentUser().saveInBackground();
-                    ParseUser.getCurrentUser().pinInBackground();
-
-                    sharedPrefEditor = sharedPref.edit();
-                    sharedPrefEditor.putString("user_email", email);
-                    sharedPrefEditor.commit();
-
-                    if(newUser){
-                        Log.d("MyApp", "User signed up and logged in through Facebook! ");
-                        createNewUser(graphUser);
-                    }else{
-                        Log.d("MyApp", "User logged in through Facebook! ");
-                        fetchExistingUser();
-                    }
+                public void onCompleted(JSONObject user, GraphResponse graphResponse) {
+                    Log.d("MyApp", "User signed up and logged in through Facebook! ");
+                    createNewUser(user);
                     startActivity(toMainActivity);
                     finish();
                 }
@@ -145,12 +169,18 @@ public class SignInActivity extends Activity {
         getApplicationContext().startService(serverIntent);
     }
 
-    public void createNewUser(GraphUser graphUser){
+    public void createNewUser(JSONObject graphUser){
+        ParseUser.getCurrentUser().put("email", graphUser.optString("email"));
+        ParseUser.getCurrentUser().saveInBackground();
+        ParseUser.getCurrentUser().pinInBackground();
+        sharedPrefEditor = sharedPref.edit();
+        sharedPrefEditor.putString("user_email", graphUser.optString("email"));
+        sharedPrefEditor.commit();
         Intent serverIntent = new Intent(getApplicationContext(), ServerAccess.class);
         serverIntent.putExtra("server_action", ServerAccess.ServerAction.ADD_USER.toString());
-        serverIntent.putExtra("email", graphUser.getProperty("email").toString());
-        serverIntent.putExtra("fname", graphUser.getFirstName());
-        serverIntent.putExtra("lname", graphUser.getLastName());
+        serverIntent.putExtra("email", graphUser.optString("email"));
+        serverIntent.putExtra("fname", graphUser.optString("first_name"));
+        serverIntent.putExtra("lname", graphUser.optString("last_name"));
         getApplicationContext().startService(serverIntent);
     }
 }
