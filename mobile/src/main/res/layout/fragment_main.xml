@@ -20,8 +20,11 @@
             android:layout_alignParentTop="true"
             android:layout_alignParentStart="true"
             android:layout_alignParentLeft="true"
-            android:src="@drawable/ic_arrow_back_black_36dp"
-            android:background="@null"/>
+            android:src="@drawable/ic_arrow_back_white_48dp"
+            android:background="@null"
+            android:paddingBottom="20dp"
+            android:paddingRight="20dp"
+            android:paddingEnd="20dp"/>
 
         <TextView
             android:layout_width="wrap_content"
@@ -29,7 +32,8 @@
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:text="Large Text"
             android:id="@+id/settingsName"
-            android:layout_below="@+id/removeButton"
+            android:textColor="@color/white"
+            android:layout_alignBottom="@+id/removeButton"
             android:layout_centerHorizontal="true" />
 
         <RelativeLayout
@@ -90,7 +94,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Current home Wifi:"
+                android:text="Home Wifi"
                 android:textSize="20dp"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"

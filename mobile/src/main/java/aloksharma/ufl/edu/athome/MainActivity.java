@@ -29,7 +29,6 @@ import android.widget.Toast;
 
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
-//import com.facebook.Session;
 import com.facebook.AccessToken;
 import com.facebook.login.LoginManager;
 import com.parse.ParseAnalytics;
@@ -40,6 +39,8 @@ import com.parse.ParseUser;
 import java.util.ArrayList;
 
 import me.alexrs.wavedrawable.WaveDrawable;
+
+//import com.facebook.Session;
 
 
 public class MainActivity extends Activity {
@@ -358,6 +359,7 @@ public class MainActivity extends Activity {
             // Use the Builder class for convenient dialog construction
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
             String old_wifi = sharedPreferences.getString("home_wifi_name", null);
+            String old_wifi_id = sharedPreferences.getString("home_wifi_id", null);
             final String new_wifi = wifiChecker.getWifiName(getActivity());
             final String new_wifi_id = wifiChecker.getWifiID(getActivity());
 
@@ -381,7 +383,7 @@ public class MainActivity extends Activity {
                         requestToServer(getActivity(), ServerAccess.ServerAction.GET_FRIENDS_HOME);
                     }
                 });
-            }else if(old_wifi.equals(new_wifi)){
+            }else if(old_wifi_id.equals(new_wifi_id)){
                 dialog_message = "Your home wifi is already set to " + old_wifi;
                 dialog_cancel = "Ok";
             }else{

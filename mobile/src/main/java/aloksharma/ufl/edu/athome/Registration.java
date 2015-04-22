@@ -35,7 +35,7 @@ public class Registration extends Activity {
         setContentView(R.layout.activity_registration);
         View someView = findViewById(R.id.reg);
         View root = someView.getRootView();
-        root.setBackgroundColor(getResources().getColor(android.R.color.holo_blue_dark));
+
         username=(EditText)findViewById(R.id.username);
         //password.setInputType(InputType.TYPE_TEXT_VARIATION_PASSWORD);
         password=(EditText)findViewById(R.id.password);

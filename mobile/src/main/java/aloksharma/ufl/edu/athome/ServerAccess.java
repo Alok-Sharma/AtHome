@@ -42,50 +42,50 @@ public class ServerAccess extends IntentService {
     /*
         Returns list of friends who are home.
      */
-    public List<AtHomeUser> getFriendsHome(ParseObject userObject){
+    public List<AtHomeUser> getFriendsHome(ParseObject userObject) {
 
         List<ParseObject> friends;
         List<AtHomeUser> friendsHome = new ArrayList<>();
 
         ParseQuery<ParseObject> friendQuery = new ParseQuery<>("AtHome");
-//        String wifi_id = sharedPreferences.getString("home_wifi_id", null);
-        String wifi_name = sharedPreferences.getString("home_wifi_name", null);
-        if(wifi_name != null){
-            wifi_name = wifi_name.replace("\"", "");
-        }
-        Log.d("guitar", "looking for wifi: " + wifi_name);
+        String wifi_id = sharedPreferences.getString("home_wifi_id", null);
+//        String wifi_name = sharedPreferences.getString("home_wifi_name", null);
+//        if(wifi_name != null){
+//            wifi_name = wifi_name.replace("\"", "");
+//        }
+        Log.d("guitar", "looking for wifi: " + wifi_id);
 
-        if(wifi_name == null){
+        if (wifi_id == null) {
             return null;
         }
 
-        friendQuery.whereEqualTo("wifi_name", wifi_name);
-        try{
+        friendQuery.whereEqualTo("wifi", wifi_id);
+        try {
             friends = friendQuery.find();
             Log.d("guitar", "fetched " + friends.size() + " friends");
             for (int j = 0; j < friends.size(); j++) {
                 Log.d("guitar", friends.get(j).getString("Email") + " is " + friends.get(j).get("Status"));
                 friends.get(j).pin(); //update their pin whenever you fetch them.
 
-                if(friends.size() == 1){
+                if (friends.size() == 1) {
                     //Current user is the only one on this Wifi.
                     return null;
                 }
-                if(friends.get(j).getString("Email").equals(userObject.getString("Email"))){
+                if (friends.get(j).getString("Email").equals(userObject.getString("Email"))) {
                     //if found myself in list, update myself in local datastore.
                     friends.get(j).pin();
-                }else if(friends.get(j).get("Status").equals(AtHomeStatus.TRUE.toString())){
+                } else if (friends.get(j).get("Status").equals(AtHomeStatus.TRUE.toString())) {
                     AtHomeUser atHomeUser = new AtHomeUser();
                     atHomeUser.setEmail(friends.get(j).getString("Email"));
                     atHomeUser.setFirstName(friends.get(j).getString("First_Name"));
                     atHomeUser.setLastName(friends.get(j).getString("Last_Name"));
                     atHomeUser.setWifi(friends.get(j).getString("wifi_name"));
                     friendsHome.add(atHomeUser);
-                }else{
+                } else {
                     //If friend not home, do nothing.
                 }
             }
-        }catch (ParseException e){
+        } catch (ParseException e) {
             Log.d("guitar", "error finding friends: " + e.getMessage());
         }
         return friendsHome;
@@ -95,26 +95,26 @@ public class ServerAccess extends IntentService {
     Done Offline. Fetches friend list. userObject wouldve already been populated.
     Returns list of email of friends.
      */
-    public List<String> getFriends(ParseObject userObject){
+    public List<String> getFriends(ParseObject userObject) {
         List<String> friends = new ArrayList<>();
-        if(userObject != null) {
+        if (userObject != null) {
             friends = userObject.getList("FriendList");
-        }else{
-            Log.d("guitar" , "error: userobject was null in getFriends");
+        } else {
+            Log.d("guitar", "error: userobject was null in getFriends");
         }
         return friends;
     }
 
-    public ParseObject getUser(String userEmail){
+    public ParseObject getUser(String userEmail) {
         List<ParseObject> userObjects = new ArrayList<>();
         ParseObject userObject;
 
         ParseQuery<ParseObject> userQueryOffline = ParseQuery.getQuery("AtHome");
         userQueryOffline.fromLocalDatastore();  //offline
         userQueryOffline.whereEqualTo("Email", userEmail);
-        try{
+        try {
             userObjects = userQueryOffline.find();
-        }catch (ParseException e){
+        } catch (ParseException e) {
             Log.d("guitar", "get user error: " + e.getMessage());
         }
 
@@ -125,9 +125,9 @@ public class ServerAccess extends IntentService {
             userQueryOnline.whereEqualTo("Email", userEmail);
             Log.d("guitarError", "email: " + userEmail);
             List<ParseObject> parseObjectsOnline = new ArrayList<>();
-            try{
+            try {
                 parseObjectsOnline = userQueryOnline.find();
-            }catch (ParseException eOnline){
+            } catch (ParseException eOnline) {
                 Log.d("guitar", "error, couldnt get user from cloud: " + eOnline.getMessage());
             }
             userObject = parseObjectsOnline.get(0);
@@ -151,14 +151,14 @@ public class ServerAccess extends IntentService {
     /*
     Add new user. Returns user object
      */
-    public ParseObject putUser(String userEmail, String first_name, String last_name){
+    public ParseObject putUser(String userEmail, String first_name, String last_name) {
         final List friendList = new ArrayList();
         final ParseObject newUser = new ParseObject("AtHome");
         //First we need to check if the object already exists on the server before we put.
         ParseQuery<ParseObject> userQuery = ParseQuery.getQuery("AtHome");
         userQuery.whereEqualTo("Email", userEmail);
-        try{
-            if(userQuery.find().size() == 0){
+        try {
+            if (userQuery.find().size() == 0) {
                 //User doesn't exist. Put new user on server
                 Log.d("guitar", "new user!");
                 newUser.put("Email", userEmail);
@@ -173,56 +173,56 @@ public class ServerAccess extends IntentService {
                 sharedPrefEditor.putString("home_wifi_id", null);
                 sharedPrefEditor.putString("home_wifi_name", null);
                 sharedPrefEditor.commit();
-            }else{
+            } else {
                 //Email already exists on server. Do not push.
                 Log.d("guitar", "user already exists.");
             }
-        }catch (ParseException e){
+        } catch (ParseException e) {
             Log.d("guitar", "unable to search for user on server/save new user: " + e.getMessage());
         }
         return newUser;
     }
 
 
-    public void setAtHomeStatus(ParseObject userObject, String status){
+    public void setAtHomeStatus(ParseObject userObject, String status) {
         //first check what we have already told the server from the existing user object. If different, then tell server.
         String statusOnServer = userObject.getString("Status");
-        if (statusOnServer == null){
+        if (statusOnServer == null) {
             statusOnServer = "";
         }
 
         Log.d("guitar", "changing status to " + status + ". User object says: " + statusOnServer);
-        if(!statusOnServer.equals(status)){
+        if (!statusOnServer.equals(status)) {
             //send to server now.
-            if(status.equals(AtHomeStatus.INVISIBLE.toString())){
+            if (status.equals(AtHomeStatus.INVISIBLE.toString())) {
                 userObject.put("Status", AtHomeStatus.INVISIBLE.toString());
                 Log.d("guitar", "changed to invisible on server.");
-            }else if(!sharedPreferences.getBoolean("invisible", false)){
+            } else if (!sharedPreferences.getBoolean("invisible", false)) {
                 userObject.put("Status", status);
                 Log.d("guitar", "changed to " + status + " on server.");
-            }else{
+            } else {
                 Log.d("guitar", "status was not null, but invisible was true, so doing nothing.");
             }
 
-            try{
+            try {
                 userObject.save();
                 userObject.pin();
-            }catch (ParseException e){
+            } catch (ParseException e) {
                 Log.d("guitar", "unable to change status: " + e.getMessage());
             }
-        }else{
+        } else {
 //            nothing new to tell server. Dont do anything.
             Log.d("guitar", "did not change status, since status hasnt changed");
         }
     }
 
-    public void setHomeWifi(ParseObject userObject){
+    public void setHomeWifi(ParseObject userObject) {
         WifiChangeReceiver wifiChangeReceiver = new WifiChangeReceiver();
         String wifiID = wifiChangeReceiver.getWifiID(this);
         String wifiName = wifiChangeReceiver.getWifiName(this);
         wifiName = wifiName.replace("\"", "");
         Log.d("guitar", "set home wifi: " + wifiID + " for the user: " + userObject.get("Email"));
-        if(wifiID != null){
+        if (wifiID != null) {
             userObject.put("wifi", wifiID);
             userObject.put("wifi_name", wifiName);
             SharedPreferences.Editor prefEdit = sharedPreferences.edit();
@@ -231,11 +231,11 @@ public class ServerAccess extends IntentService {
             prefEdit.commit();
 
             Log.d("guitar", "saving wifi: " + wifiID);
-            try{
+            try {
                 userObject.save();
                 userObject.pin();
-            }catch (ParseException e){
-                Log.d("guitar", "error pushing wifi: " +e.getMessage());
+            } catch (ParseException e) {
+                Log.d("guitar", "error pushing wifi: " + e.getMessage());
             }
         }
     }
@@ -250,39 +250,33 @@ public class ServerAccess extends IntentService {
         Intent responseIntent = new Intent("server_response");
         responseIntent.putExtra("server_action", action);
 
-        if(action.equals(ServerAction.GET_FRIENDS.toString())){
+        if (action.equals(ServerAction.GET_FRIENDS.toString())) {
             List<String> friendList = getFriends(getUser(userEmail));
             Log.d("guitarintent", "get friends intent: " + friendList);
             responseIntent.putStringArrayListExtra("data", new ArrayList<>(friendList));
-        }
-        else if(action.equals(ServerAction.ADD_USER.toString())){
+        } else if (action.equals(ServerAction.ADD_USER.toString())) {
             Log.d("guitarintent", "add user intent");
             putUser(intent.getStringExtra("email"), intent.getStringExtra("fname"), intent.getStringExtra("lname"));
-        }
-        else if(action.equals(ServerAction.GET_FRIENDS_HOME.toString())){
+        } else if (action.equals(ServerAction.GET_FRIENDS_HOME.toString())) {
             List<AtHomeUser> friendsHome = getFriendsHome(getUser(userEmail));
             Log.d("guitarintent", "get friends home: " + friendsHome);
-            if(friendsHome == null){
+            if (friendsHome == null) {
                 //Current user is the only one on this wifi
                 responseIntent.putParcelableArrayListExtra("data", null);
-            }else{
+            } else {
                 responseIntent.putParcelableArrayListExtra("data", new ArrayList<>(friendsHome));
             }
-        }
-        else if(action.equals(ServerAction.SET_HOME_STATUS.toString())){
+        } else if (action.equals(ServerAction.SET_HOME_STATUS.toString())) {
             Log.d("guitarintent", "set home status intent: " + intent.getStringExtra("server_action_arg") + " email: " + userEmail);
             setAtHomeStatus(getUser(userEmail), intent.getStringExtra("server_action_arg"));
-        }
-        else if(action.equals(ServerAction.SET_INVISIBLE.toString())) {
+        } else if (action.equals(ServerAction.SET_INVISIBLE.toString())) {
             Log.d("guitarintent", "set invisible");
             setAtHomeStatus(getUser(userEmail), AtHomeStatus.INVISIBLE.toString());
-        }
-        else if(action.equals(ServerAction.GET_USER.toString())){
+        } else if (action.equals(ServerAction.GET_USER.toString())) {
             Log.d("guitarintent", "get user intent");
             ParseObject userObject = getUser(userEmail);
             //Take data out of userobject and send broadcast.
-        }
-        else if(action.equals(ServerAction.SET_WIFI.toString())) {
+        } else if (action.equals(ServerAction.SET_WIFI.toString())) {
             Log.d("guitarintent", "set wifi intent");
             setHomeWifi(getUser(userEmail));
         }
